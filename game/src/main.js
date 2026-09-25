@@ -76,6 +76,13 @@ async function boot() {
     renderer = new Renderer(document.getElementById('arena-canvas'));
     bindArenaClick();
 
+    // 窗口尺寸变化（含窄屏旋转/分栏切换）时重建脑活动画布分辨率，去抖 200ms
+    let resizeTimer = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => brainView && brainView.resize(), 200);
+    });
+
     // 接线 worker 消息
     worker.onmessage = (e) => {
       const d = e.data;

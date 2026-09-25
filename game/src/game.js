@@ -38,6 +38,8 @@ const CFG = {
   escapeTime: 1.0,          // 逃离持续时间（s）
   startleSurgeRatio: 1.5,   // desc 放电飙升判定倍率
   emaTau: 5,                // desc 放电率基线 EMA 时间常数（s）
+  bananaMinDist: 150,       // 随机香蕉距果蝇的最小/最大距离（px，关卡设计参数：
+  bananaMaxDist: 250,       // 上限 250 使首吃中位时间 ~50s→~27s，见 README 调参记录）
 };
 
 function wrapAngle(a) {
@@ -85,12 +87,15 @@ export class Game {
   }
 
   placeBanana(x, y) {
-    // 不放参数时随机刷新（距果蝇至少 150px）
+    // 不放参数时随机刷新：距离约束在 [bananaMinDist, bananaMaxDist]（关卡设计参数，
+    // 与脑无关——香蕉太远时首吃时间被初始距离主导，见 README 调参记录）
     if (x === undefined) {
+      const minD = this.cfg.bananaMinDist, maxD = this.cfg.bananaMaxDist;
       for (let tries = 0; tries < 50; tries++) {
         const bx = ARENA.margin + Math.random() * (ARENA.w - 2 * ARENA.margin);
         const by = ARENA.margin + Math.random() * (ARENA.h - 2 * ARENA.margin);
-        if (Math.hypot(bx - this.fly.x, by - this.fly.y) >= 150 || tries === 49) {
+        const d = Math.hypot(bx - this.fly.x, by - this.fly.y);
+        if ((d >= minD && d <= maxD) || tries === 49) {
           this.banana = { x: bx, y: by };
           break;
         }

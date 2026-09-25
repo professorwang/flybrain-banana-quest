@@ -183,3 +183,46 @@ footer a { color: #4fc3f7; }
   padding: 2px 6px;
   border-radius: 4px;
 }
+
+
+/* ============ 窄屏/移动端适配（≤900px）：单列布局 + 触屏放大 ============ */
+@media (max-width: 900px) {
+  header { padding: 10px 12px 6px; }
+  header h1 { font-size: 19px; }
+  .tagline { font-size: 12px; }
+
+  main {
+    flex-direction: column;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  #arena-wrap { width: 100%; }
+  #arena-canvas {
+    width: 100%;
+    max-width: 100%;
+    height: auto;          /* 依 canvas 属性比例随屏宽缩放，内部仍是 560x560 逻辑坐标 */
+  }
+
+  #panel {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  /* 触屏友好：更大字号、更大的滑块与按钮点击区 */
+  body { font-size: 15px; }
+  .block { padding: 10px 12px; }
+  .hud-row { font-size: 14px; margin: 6px 0; }
+  .hud-row > span:first-child { flex-basis: 84px; }
+  .bar { height: 16px; }
+  .slider-row { font-size: 14px; margin: 10px 0; }
+  .slider-row label { flex-basis: 92px; }
+  .slider-row input[type="range"] { height: 30px; }
+  .slider-row span { flex-basis: 54px; }
+  .btn-row { gap: 10px; }
+  button { padding: 11px 14px; font-size: 14px; }
+  #bar-canvas { height: 130px; }
+  #raster-canvas { height: 170px; }
+  #honesty ul { font-size: 13px; }
+}

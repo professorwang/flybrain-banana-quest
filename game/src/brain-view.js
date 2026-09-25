@@ -61,6 +61,21 @@ export class BrainView {
     }
   }
 
+  /* 窗口尺寸变化后重建画布分辨率（由 main.js 的 resize 监听调用）。
+   * raster 离屏画布按左上角对齐拷贝旧内容，尽量保留放电历史。 */
+  resize() {
+    this._setupCanvases();
+    const neo = document.createElement('canvas');
+    neo.width = this.rasterCanvas.width;
+    neo.height = this.rasterCanvas.height;
+    const nctx = neo.getContext('2d');
+    nctx.fillStyle = '#10131a';
+    nctx.fillRect(0, 0, neo.width, neo.height);
+    nctx.drawImage(this.off, 0, 0);
+    this.off = neo;
+    this.offCtx = nctx;
+  }
+
   /* 每个 worker tick 调用 */
   onTick(firedIndices, groupSpikeCounts) {
     // 条形图平滑值
