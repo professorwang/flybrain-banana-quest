@@ -9,7 +9,9 @@
 
 ## 运行
 
-因为浏览器对 `fetch`/`Worker` 有同源限制，需要本地静态服务器：
+**在线试玩**：https://professorwang.github.io/flybrain-banana-quest/
+
+本地运行（浏览器对 `fetch`/`Worker` 有同源限制，需要本地静态服务器）：
 
 ```bash
 cd game

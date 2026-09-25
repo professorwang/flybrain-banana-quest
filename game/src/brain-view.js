@@ -124,14 +124,17 @@ export class BrainView {
   _drawRaster() {
     const c = this.rasterCanvas, ctx = c.getContext('2d');
     ctx.drawImage(this.off, 0, 0);
-    // 左侧行标签
+    // 左侧行标签（行距过密时跳过，避免重叠）
     const H = c.height;
     const rowH = H / this.rows.length;
     const dpr = window.devicePixelRatio || 1;
     ctx.font = `${Math.max(8, 8 * dpr)}px sans-serif`;
+    let lastLabeledRow = -10;
     for (let r = 0; r < this.rows.length; r++) {
       const g = this.rows[r];
       if (!LABEL_GROUPS.has(g.id)) continue;
+      if (r - lastLabeledRow < 3) continue;
+      lastLabeledRow = r;
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
       ctx.fillText(g.name, 2, r * rowH + rowH * 0.7);
     }

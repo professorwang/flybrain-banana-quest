@@ -63,6 +63,9 @@ node game/test/sim.test.mjs             # Node 烟雾测试
 node game/tools/headless_run.mjs 120    # 无头闭环验证（应能吃到香蕉）
 ```
 
+**在线试玩**：https://professorwang.github.io/flybrain-banana-quest/ （GitHub Pages，仓库即
+[professorwang/flybrain-banana-quest](https://github.com/professorwang/flybrain-banana-quest)）
+
 玩法、架构、科学诚实声明（哪些是真实连接组、哪些是简化与人工选取）见
 [game/README.md](game/README.md)；数据与代码许可见
 [game/THIRD_PARTY_NOTICES.md](game/THIRD_PARTY_NOTICES.md)。
