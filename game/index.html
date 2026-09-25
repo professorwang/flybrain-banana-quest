@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电子果蝇·香蕉大作战 — Digital Fruit Fly: Banana Quest</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>电子果蝇·香蕉大作战</h1>
+  <p class="tagline">139,255 个真实连接组神经元（FlyWire FAFB v783）正在驱动这只果蝇 ·
+    Eon 的闭环没开源，我们做一个浏览器里能跑的开源版</p>
+</header>
+
+<main>
+  <section id="arena-wrap">
+    <canvas id="arena-canvas" width="560" height="560"></canvas>
+    <p class="hint">操作：点击果蝇 = 触摸惊吓 · 点击空白处 = 把香蕉放到那里</p>
+  </section>
+
+  <aside id="panel">
+    <section class="block">
+      <h2>状态</h2>
+      <div class="hud-row"><span>饥饿度</span>
+        <div class="bar"><div id="hud-hunger-fill"></div></div>
+        <span id="hud-hunger-text">0%</span></div>
+      <div class="hud-row"><span>得分</span><b id="hud-score">0</b></div>
+      <div class="hud-row"><span>行为状态</span><b id="hud-status">初始化…</b></div>
+      <div class="hud-row"><span>活跃神经元</span><b id="hud-active">—</b></div>
+      <div class="hud-row"><span>放电</span><b id="hud-fired">—</b></div>
+      <div class="hud-row"><span>单 tick 耗时</span><b id="hud-tickms">—</b></div>
+      <div class="hud-row"><span>脑 tick 频率</span><b id="hud-tickrate">—</b></div>
+    </section>
+
+    <section class="block">
+      <h2>脑活动 <small>63 功能组 · 蓝=感觉 紫=中枢 橙=驱动 绿=运动</small></h2>
+      <canvas id="bar-canvas" class="brain"></canvas>
+      <canvas id="raster-canvas" class="brain"></canvas>
+    </section>
+
+    <section class="block">
+      <h2>参数（实时生效）</h2>
+      <div class="slider-row"><label>放电阈值</label>
+        <input id="slider-threshold" type="range" min="0.5" max="2" step="0.05" value="1">
+        <span id="slider-threshold-val">1.00</span></div>
+      <div class="slider-row"><label>泄漏率</label>
+        <input id="slider-leak" type="range" min="0.8" max="0.99" step="0.01" value="0.95">
+        <span id="slider-leak-val">0.95</span></div>
+      <div class="slider-row"><label>输入增益</label>
+        <input id="slider-gain" type="range" min="0" max="2" step="0.05" value="1">
+        <span id="slider-gain-val">1.00</span></div>
+      <div class="slider-row"><label>脑 tick 频率</label>
+        <input id="slider-tickrate" type="range" min="5" max="20" step="1" value="10">
+        <span id="slider-tickrate-val">10 Hz</span></div>
+    </section>
+
+    <section class="block">
+      <h2>操作</h2>
+      <div class="btn-row">
+        <button id="btn-banana">放香蕉（喂食）</button>
+        <button id="btn-poke">触摸惊吓</button>
+        <button id="btn-wind">吹风</button>
+        <button id="btn-light">关灯（黑暗）</button>
+      </div>
+      <div class="btn-row">
+        <button id="btn-reset-brain">重置大脑</button>
+        <button id="btn-reset-game">重置游戏</button>
+      </div>
+    </section>
+
+    <details id="honesty" class="block" open>
+      <summary><h2>科学诚实声明（必读）</h2></summary>
+      <ul>
+        <li><b>真实：</b>连接组拓扑来自 <b>FlyWire FAFB v783</b>（139,255 神经元、
+          2,698,236 条聚合连接，含递质符号），行为由这份真实拓扑上的脉冲传播驱动。</li>
+        <li><b>近似：</b>LIF 动力学与权重归一化是简化模型。默认按突触后神经元总输入
+          归一化（Shiu et al. 2024 思路）；不是电导模型，无突触延迟与神经调质。</li>
+        <li><b>人工选取：</b>感觉映射（气味→触角 ORN 池左右拆分）与运动读出池
+          （GNG_DESC 按胞体 x 坐标切半）是人工选取的，非解剖学精确；实测转向信号
+          微弱且带结构偏置，已做基线校正。</li>
+        <li><b>缺失：</b>FlyWire 不含腹神经索（VNC）。真实果蝇的行走由 VNC 主导，
+          本 demo 的"行走"只是下行神经元放电率的图形化映射。</li>
+        <li><b>边界：</b>本 demo 不代表"意识上传"。一只会动的果蝇本身并不证明
+          生物保真度（此表述参照 awesome-fly 的免责声明精神）。</li>
+      </ul>
+    </details>
+  </aside>
+</main>
+
+<footer>
+  <p>连接组数据：FlyWire FAFB v783（Dorkenwald et al., 2024, <i>Nature</i>；CC BY-NC-SA 4.0）·
+    二进制整理与仿真参考：<a href="https://github.com/snedea/flybrain">snedea/flybrain</a>（MIT）·
+    详见 <a href="THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.md</a></p>
+</footer>
+
+<div id="loading"><p id="loading-text">加载中…</p></div>
+<link rel="icon" href="data:,">
+<div id="error-overlay" hidden>
+  <div><h2>出错了</h2><p></p>
+  <p class="hint">本游戏需要通过本地服务器访问：在 game/ 目录运行
+    <code>python -m http.server 8000</code> 后打开 http://localhost:8000</p></div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

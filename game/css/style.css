@@ -1,0 +1,185 @@
+/* style.css —— 《电子果蝇·香蕉大作战》深色主题 */
+* { box-sizing: border-box; }
+
+/* hidden 属性必须压过 overlay 的 display:flex（否则遮罩永远可见） */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: #0b0e14;
+  color: #d8dee9;
+  font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+  line-height: 1.5;
+}
+
+header {
+  padding: 12px 20px 8px;
+  border-bottom: 1px solid #232a38;
+}
+header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #ffd640;
+}
+.tagline {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #9aa5b8;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 20px;
+  align-items: flex-start;
+}
+
+#arena-wrap { flex: 0 0 auto; }
+#arena-canvas {
+  width: 560px;
+  height: 560px;
+  border-radius: 8px;
+  cursor: crosshair;
+  display: block;
+}
+.hint { font-size: 12px; color: #7d879c; margin: 6px 2px 0; }
+
+#panel {
+  flex: 1 1 360px;
+  max-width: 460px;
+  min-width: 320px;
+}
+
+.block {
+  background: #11151d;
+  border: 1px solid #232a38;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.block h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #ffd640;
+  display: inline-block;
+}
+.block h2 small {
+  font-size: 11px;
+  color: #7d879c;
+  font-weight: normal;
+  margin-left: 8px;
+}
+
+.hud-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin: 4px 0;
+}
+.hud-row > span:first-child { flex: 0 0 76px; color: #9aa5b8; }
+.hud-row b { color: #e8eef7; font-weight: 600; }
+.bar {
+  flex: 1;
+  height: 12px;
+  background: #232a38;
+  border-radius: 6px;
+  overflow: hidden;
+}
+#hud-hunger-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #7ee787, #ffd640, #ff7878);
+  transition: width 0.3s;
+}
+
+canvas.brain {
+  width: 100%;
+  display: block;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+#bar-canvas { height: 110px; }
+#raster-canvas { height: 150px; }
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin: 6px 0;
+}
+.slider-row label { flex: 0 0 84px; color: #9aa5b8; }
+.slider-row input[type="range"] { flex: 1; accent-color: #ffd640; }
+.slider-row span { flex: 0 0 48px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
+button {
+  background: #232a38;
+  color: #e8eef7;
+  border: 1px solid #35405a;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+button:hover { background: #2c3648; border-color: #ffd640; }
+button:active { transform: translateY(1px); }
+
+#honesty summary { cursor: pointer; }
+#honesty summary h2 { display: inline; }
+#honesty ul { margin: 8px 0 4px; padding-left: 20px; font-size: 12.5px; }
+#honesty li { margin-bottom: 6px; }
+#honesty b { color: #ffd640; }
+
+footer {
+  padding: 8px 20px 20px;
+  font-size: 12px;
+  color: #7d879c;
+  border-top: 1px solid #232a38;
+}
+footer a { color: #4fc3f7; }
+
+#loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 14, 20, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  z-index: 10;
+}
+#loading p::after {
+  content: '';
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  animation: dots 1.2s steps(4) infinite;
+}
+@keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+#error-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 14, 20, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+#error-overlay > div {
+  max-width: 480px;
+  background: #1a2029;
+  border: 1px solid #ff7878;
+  border-radius: 8px;
+  padding: 20px 28px;
+}
+#error-overlay h2 { color: #ff7878; margin-top: 0; }
+#error-overlay code {
+  background: #232a38;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
