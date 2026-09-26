@@ -24,15 +24,15 @@
 \title{Packaging choices change connectome-simulation outcomes:\\
 sign tables, a bidirectional intervention, and honest lessons\\
 from two connectomes}
-\author{Banana Quest project (\texttt{fruitfly/game/})}
-\date{Technical note v5, 2026-09-27}
+\author{professorwang\thanks{GitHub: \url{https://github.com/professorwang}. 投稿前请作者将此处替换为正式姓名与单位（arXiv 要求对内容负责的人类作者）。}}
+\date{Technical note v5.1, 2026-09-27}
 
 \begin{document}
 \maketitle
 
 \begin{sloppypar}
 \noindent\small
-\textbf{Technical note v5, 2026-09-27.} Code: \texttt{fruitfly/game/} ---
+\textbf{Technical note v5.1, 2026-09-27.} Code: \texttt{fruitfly/game/} ---
 commit lineage in \S7, this revision @ \texttt{99ed490}(MIT). Data:
 FlyWire FAFB v783 (CC BY-NC 4.0) and MaleCNS v1.0 (CC BY 4.0). v5 restructures
 the note around one mainline question --- how do data-packaging choices change
@@ -431,7 +431,8 @@ sign-flip bidirectional probe & \texttt{node game/tools/probe\_signflip.mjs} \\
 MaleCNS feeding/escape/ascending probes & \texttt{node game/tools/probe\_supplementary.mjs} \\
 FlyWire closed loop (seed 7: first eat 34.8 s, score 2/120 s) & \texttt{node game/tools/headless\_run.mjs 120 '\{\}' 7 flywire} \\
 MaleCNS closed loop (score 1, first eat 104.3 s) & \texttt{node game/tools/headless\_run.mjs 180 '\{\}' 7 malecns} \\
-sweep rounds 1--2 (historical default restored) & \texttt{node game/tools/tune\_sweep.mjs '<grid JSON with "bananaMaxDist":[null]>'} \\
+sweep round 1, historical default restored & \texttt{node game/tools/tune\_sweep.mjs '\{"turnGain":[2.6,4,6],"smellSigma":[130,250],\newline "baseSpeed":[6,12],"bananaMaxDist":[null]\}'} \\
+sweep round 2, historical default restored & \texttt{node game/tools/tune\_sweep.mjs '\{"turnGain":[1.8,2.6],"emaTau":[5,20,40],\newline "baseSpeed":[6,12],"bananaMaxDist":[null]\}'} \\
 champion config, historical default restored (3.00; 2.20 under current default) & \texttt{node game/tools/tune\_sweep.mjs '\{"turnGain":[1.8],"emaTau":[5],\newline "baseSpeed":[6],"bananaMaxDist":[null]\}'} \\
 out-of-sample \& level-design comparisons + champion out-of-sample (8/10, 57.7 s, 1.30) & \texttt{node game/tools/reproduce\_sweeps.mjs} \\
 \bottomrule
@@ -488,7 +489,34 @@ BY-NC-SA 4.0 was an assumption); note restructured around the
 packaging-choices mainline with correction chronology moved here;
 precedent-comparison section added; boundary statement for the causal claim
 added; Fandol fonts for the LaTeX source.
+\item \textbf{v5 $\to$ v5.1 (final review).} \S2.3 onset description reconciled
+with the table (FlyWire already fires 10 GNG\_DESC spikes at ti=2); inaccurate
+``upstream only qualitative on gain'' comparison removed; full sweep/champion
+grid commands restored in both formats; commit reference filled; two summary
+sentences rescoped to the tested packages, stimulus and reference gain;
+``robustly helped'' narrowed to ``improved on the tested seeds''.
 \end{itemize}
+
+\section*{Author contributions and AI-use disclosure}
+
+\textbf{Author}: professorwang (human; replace with legal name and affiliation
+before journal submission). The human author directed the project, chose the
+research questions, reviewed intermediate and final artifacts, ran independent
+verification of key results, and takes responsibility for all content.
+
+\textbf{AI use} (per arXiv policy on generative AI language tools): an AI
+coding assistant (Kimi Code) wrote most of the simulation/game code and
+drafted this note and the review-response letter under human direction; AI
+systems (Codex and Claude) performed multi-round technical review of the
+manuscripts, including independent re-runs of the probe battery that we
+cross-checked against our own runs (their re-derived numbers matched ours in
+every case reported in the response letter). No AI system is listed as an
+author; every AI-generated number quoted in this note was re-derived by our
+own frozen scripts before inclusion. \textbf{Review-identity note}: the
+``reviews'' documented in the correction history and the response letter are
+AI-assisted technical reviews with scripted re-verification --- they are not
+independent laboratory validation and not formal peer review; arXiv moderation
+itself is also not peer review.
 
 \begin{thebibliography}{99}
 \footnotesize

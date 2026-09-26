@@ -1,6 +1,6 @@
 # Packaging choices change connectome-simulation outcomes: sign tables, a bidirectional intervention, and honest lessons from two connectomes
 
-**Technical note v5, 2026-09-27. Code: `fruitfly/game/` — commit lineage in §7, this revision @ `99ed490` (MIT). Data: FlyWire FAFB v783 (CC BY-NC 4.0) and MaleCNS v1.0 (CC BY 4.0). v5 restructures the note around one mainline question — how do data-packaging choices change the conclusions of "run dynamics on a connectome" simulations? Earlier finding-level detail is compressed; the full correction chronology moved to Appendix A and the review-response letter (`docs/REVIEW-RESPONSE.md`).**
+**Technical note v5.1, 2026-09-27. Code: `fruitfly/game/` — commit lineage in §7, this revision @ `99ed490` (MIT). Data: FlyWire FAFB v783 (CC BY-NC 4.0) and MaleCNS v1.0 (CC BY 4.0). v5 restructures the note around one mainline question — how do data-packaging choices change the conclusions of "run dynamics on a connectome" simulations? Earlier finding-level detail is compressed; the full correction chronology moved to Appendix A and the review-response letter (`docs/REVIEW-RESPONSE.md`). v5.1 applies the final review's five fixes.**
 
 ## 中文摘要
 
@@ -131,7 +131,7 @@ All numbers in this note were produced on this repository (Node v24, Python 3.13
 | MaleCNS feeding/escape/ascending probes | `node game/tools/probe_supplementary.mjs` (archive: `docs/results/probe_supplementary.txt`) |
 | FlyWire closed loop (seed 7: first eat 34.8 s, score 2/120 s) | `node game/tools/headless_run.mjs 120 '{}' 7 flywire` |
 | MaleCNS closed loop (score 1, first eat 104.3 s) | `node game/tools/headless_run.mjs 180 '{}' 7 malecns` |
-| sweep round 1, historical default restored | `node game/tools/tune_sweep.mjs '{"bananaMaxDist":[null]}'` |
+| sweep round 1, historical default restored | `node game/tools/tune_sweep.mjs '{"turnGain":[2.6,4,6],"smellSigma":[130,250],"baseSpeed":[6,12],"bananaMaxDist":[null]}'` |
 | sweep round 2, historical default restored | `node game/tools/tune_sweep.mjs '{"turnGain":[1.8,2.6],"emaTau":[5,20,40],"baseSpeed":[6,12],"bananaMaxDist":[null]}'` |
 | champion config, historical default restored (3.00; 2.20 under current default) | `node game/tools/tune_sweep.mjs '{"turnGain":[1.8],"emaTau":[5],"baseSpeed":[6],"bananaMaxDist":[null]}'` |
 | out-of-sample & level-design comparisons + champion out-of-sample (8/10, 57.7 s, 1.30) | `node game/tools/reproduce_sweeps.mjs` (archive: `docs/results/reproduce_sweeps.txt`) |
@@ -146,6 +146,14 @@ The review-driven corrections, in order, each with its disposition. Full point-b
 - **v3 → v4 (second review).** Histamine sign-table correction (v3's "both inhibitory" was wrong; v4's interim "default +1, photoreceptors affected" was also wrong — see v4.1); FlyWire reverse sign-flip experiment added (necessity), with equivalence self-check; frozen `probe_gain.mjs` / `probe_signflip.mjs`; explicit-seed closed-loop records (34.8 s); historical sweep commands given explicit `"bananaMaxDist":[null]`; vendor acquisition doc with SHA-256.
 - **v4 → v4.1 (third review, "minor revisions").** Histamine account corrected to the six-class-labels evidence (no histamine class in FlyWire's prediction; no inference about real histaminergic signing); reverse-experiment precision (source-table re-aggregation wording; scope note 517/77,650/23,905; "sufficient and necessary" restricted to ti=4, I=1, 200 ticks, GLUT ±); two final frozen reproduction entries (`probe_supplementary.mjs`, `reproduce_sweeps.mjs`); "asymptote" wording replaced by 100-tick observed maxima; §4.2 fast-search comparison written out in full.
 - **v4.1 → v5 (fourth review, this restructure).** FlyWire license corrected to CC BY-NC 4.0 per the official guidelines (earlier CC BY-NC-SA 4.0 was an assumption); note restructured around the packaging-choices mainline with correction chronology moved here; precedent-comparison section added; boundary statement for the causal claim added; Fandol fonts for the LaTeX source.
+
+- **v5 → v5.1 (final review).** §2.3 onset description reconciled with the table (FlyWire already fires 10 GNG_DESC spikes at ti=2); inaccurate "upstream only qualitative on gain" comparison removed; full sweep/champion grid commands restored in both formats; commit reference filled; two summary sentences rescoped to the tested packages, stimulus and reference gain; "robustly helped" narrowed to "improved on the tested seeds".
+
+## Author contributions and AI-use disclosure
+
+**Author**: professorwang (human; replace with legal name and affiliation before journal submission). The human author directed the project, chose the research questions, reviewed intermediate and final artifacts, ran independent verification of key results, and takes responsibility for all content.
+
+**AI use (per arXiv policy on generative AI language tools)**: an AI coding assistant (Kimi Code) wrote most of the simulation/game code and drafted this note and the review-response letter under human direction; AI systems (Codex and Claude) performed multi-round technical review of the manuscripts, including independent re-runs of the probe battery that we cross-checked against our own runs (their re-derived numbers matched ours in every case reported in the response letter). No AI system is listed as an author; every AI-generated number quoted in this note was re-derived by our own frozen scripts before inclusion. **Review-identity note**: the "reviews" documented in the correction history and the response letter are AI-assisted technical reviews with scripted re-verification — they are not independent laboratory validation and not formal peer review; arXiv moderation itself is also not peer review.
 
 ## References
 

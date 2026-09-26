@@ -39,7 +39,7 @@ python game/docs/arxiv/check_us.py    # 应输出 0 命中
 
 ## 已知注意点
 
-- **本地编译已验收**（2026-09-27，MiKTeX xelatex 两遍）：8 页、字体全嵌入、无错误；
+- **本地编译已验收**（2026-09-27，MiKTeX xelatex 两遍）：字体全嵌入、无错误；
   唯一 Overfull 为 0.45pt（不可见）。首次编译如遇告警，常见候选：长 `\url{}` 断行
   （必要时加载 `xurl`）、§7 复现表长命令串（已用 `\footnotesize` + `sloppypar`
   + 固定 `p{}` 列宽 + 手动断行处理）。
