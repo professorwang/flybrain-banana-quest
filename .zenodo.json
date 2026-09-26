@@ -1,0 +1,34 @@
+{
+  "title": "Banana Quest: a browser foraging game driven by the full FlyWire whole-brain connectome (with a Chinese knowledge base on fly connectomics and whole-brain emulation)",
+  "description": "Zero-dependency browser game in which a leaky integrate-and-fire network over the real FlyWire FAFB v783 connectome (139,255 neurons) drives a foraging fly, with an optional MaleCNS v1.0 mode (176,422 neurons, with VNC). Includes a technical note on normalization failure, structural readout bias, and tuning methodology on aggregated connectomes, plus a Chinese knowledge base on fly connectomics and whole-brain emulation.",
+  "creators": [
+    {
+      "name": "professorwang"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "Drosophila",
+    "connectome",
+    "FlyWire",
+    "MaleCNS",
+    "leaky integrate-and-fire",
+    "whole-brain emulation",
+    "browser simulation"
+  ],
+  "upload_type": "software",
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/professorwang/flybrain-banana-quest",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://doi.org/10.1038/s41586-024-07558-y",
+      "relation": "isDerivedFrom",
+      "resource_type": "publication"
+    }
+  ],
+  "notes": "Game code MIT. Connectome data: FlyWire FAFB v783 CC BY-NC-SA 4.0 (non-commercial); MaleCNS v1.0 CC BY 4.0. See game/THIRD_PARTY_NOTICES.md."
+}
