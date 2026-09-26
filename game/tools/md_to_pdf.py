@@ -208,18 +208,18 @@ def build(md_path: str, pdf_path: str) -> dict:
         "subtitle": ParagraphStyle("subtitle", fontName=body, fontSize=8.5, leading=12.5,
                                    textColor=colors.HexColor("#444455"), spaceAfter=2),
         "h2": ParagraphStyle("h2", fontName=bold, fontSize=12, leading=15,
-                             spaceBefore=6, spaceAfter=3, keepWithNext=True,
+                             spaceBefore=5.5, spaceAfter=2.8, keepWithNext=True,
                              textColor=colors.HexColor("#1a1a2e")),
         "h3": ParagraphStyle("h3", fontName=bold, fontSize=10, leading=13.5,
                              spaceBefore=7, spaceAfter=3.5, keepWithNext=True,
                              textColor=colors.HexColor("#2a2a3e")),
-        "body": ParagraphStyle("body", fontName=body, fontSize=8.5, leading=12.4,
-                               spaceAfter=3.5, alignment=TA_LEFT, splitLongWords=True),
-        "item": ParagraphStyle("item", fontName=body, fontSize=8.5, leading=12.4,
+        "body": ParagraphStyle("body", fontName=body, fontSize=8.4, leading=12.1,
+                               spaceAfter=3.2, alignment=TA_LEFT, splitLongWords=True),
+        "item": ParagraphStyle("item", fontName=body, fontSize=8.4, leading=12.1,
                                spaceAfter=2.5, leftIndent=14, bulletIndent=2,
                                splitLongWords=True),
-        "ref": ParagraphStyle("ref", fontName=body, fontSize=8.2, leading=11.1,
-                              spaceAfter=1.8, leftIndent=16, firstLineIndent=-16,
+        "ref": ParagraphStyle("ref", fontName=body, fontSize=8.0, leading=10.5,
+                              spaceAfter=1.5, leftIndent=16, firstLineIndent=-16,
                               splitLongWords=True),
         "cell": ParagraphStyle("cell", fontName=body, fontSize=8, leading=10.5,
                                splitLongWords=True),
@@ -234,9 +234,8 @@ def build(md_path: str, pdf_path: str) -> dict:
         story.append(Paragraph(inline(subtitle, mono), ss["subtitle"]))
     story.append(Paragraph(
         'Repository: <font color="#1a5fb4">https://github.com/professorwang/flybrain-banana-quest</font>'
-        ' @ commit <font face="%s">73da541</font>'
         ' · Demo: <font color="#1a5fb4">https://professorwang.github.io/flybrain-banana-quest/</font>'
-        '（?dataset=malecns 切换 MaleCNS）' % mono, ss["subtitle"]))
+        '（?dataset=malecns 切换 MaleCNS）', ss["subtitle"]))
     rule = Table([[""]], colWidths=[17 * cm], rowHeights=[1])
     rule.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#1a1a2e")),
                               ("LINEBELOW", (0, 0), (-1, -1), 1.5, colors.HexColor("#1a1a2e"))]))
@@ -302,7 +301,7 @@ def build(md_path: str, pdf_path: str) -> dict:
                 ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#999999")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 4), ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-                ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+                ("TOPPADDING", (0, 0), (-1, -1), 1.8), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.8),
             ]))
             story.append(t)
             story.append(Spacer(1, 3))
@@ -312,14 +311,14 @@ def build(md_path: str, pdf_path: str) -> dict:
         canv.saveState()
         canv.setFont(body, 7.5)
         canv.setFillColor(colors.HexColor("#777788"))
-        canv.drawString(2.5 * cm, 1.35 * cm, "Banana Quest technical note v4 (2026-09-26)")
+        canv.drawString(2.5 * cm, 1.35 * cm, "Banana Quest technical note v4.1 (2026-09-27)")
         canv.drawRightString(A4[0] - 2.5 * cm, 1.35 * cm, f"Page {doc.page}")
         canv.restoreState()
 
     doc = SimpleDocTemplate(pdf_path, pagesize=A4,
                             leftMargin=2.5 * cm, rightMargin=2.5 * cm,
                             topMargin=2.5 * cm, bottomMargin=2.2 * cm,
-                            title="Banana Quest technical note v4",
+                            title="Banana Quest technical note v4.1",
                             author="fruitfly/game")
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return stats

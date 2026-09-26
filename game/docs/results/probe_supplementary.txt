@@ -1,0 +1,4 @@
+| 进食链 | gus I=1.2 × 30 tick | feed_readout 放电 3 | 首个 tick 22 |
+| 逃逸链 | mech_bristle 2.0 脉冲 + 0.8 × 20 tick | DNp01 放电 0 | AN(组18) 累计 710 |
+| 嗅觉→上行 | olf_left I=1.0 × 200 tick | AN 累计 0 | DN 累计 75 |
+探针完成。

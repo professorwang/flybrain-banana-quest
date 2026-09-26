@@ -7,7 +7,7 @@ vendor/ 目录不入库（.gitignore），需自行获取以下两个上游仓�
 
 ```bash
 git clone https://github.com/snedea/flybrain vendor/snedea-flybrain
-cd vendor/snedea-flybrain && git checkout 9191824d17871b7851645782d53d23f213ddb938
+git -C vendor/snedea-flybrain checkout 9191824d17871b7851645782d53d23f213ddb938
 ```
 
 数据许可证：FlyWire 连接组本体 CC BY-NC-SA 4.0（Dorkenwald et al. 2024, *Nature*）。
@@ -22,13 +22,17 @@ cd vendor/snedea-flybrain && git checkout 9191824d17871b7851645782d53d23f213ddb9
 | `data/neuron_meta.json` | `a0d04cc964e23ebba476a9298bafe04387957c0cbbe2cb5edea5ecfcb2c47902` |
 
 游戏用到的 `game/data/connectome.bin.gz` 与 `game/data/neuron_meta.json` 即上表两个
-文件的**逐字节拷贝**（校验方法：`python -c "import hashlib;print(hashlib.sha256(open(p,'rb').read()).hexdigest())"`）。
+文件的**逐字节拷贝**。校验方法（把路径作为参数传入，勿在命令里留未定义变量）：
+
+```bash
+python -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" vendor/snedea-flybrain/data/connectome.bin.gz
+```
 
 ## 2. MaleCNS 数据：blendi-remade/fly-brain-minecraft（MIT）
 
 ```bash
 git clone https://github.com/blendi-remade/fly-brain-minecraft vendor/fly-brain-minecraft
-cd vendor/fly-brain-minecraft && git checkout 6cfa30175003ef25da68a237d5eda958f8047b82
+git -C vendor/fly-brain-minecraft checkout 6cfa30175003ef25da68a237d5eda958f8047b82
 ```
 
 | 文件 | SHA-256 |
