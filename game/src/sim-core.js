@@ -18,7 +18,7 @@ export const DEFAULTS = {
   threshold: 1.0,          // 放电阈值
   refractoryPeriod: 3,     // 不应期（tick 数）
   weightScale: 0.15,       // global-max 模式的权重归一化上限（沿用参考实现）
-  targetInput: 3.0,        // per-neuron 模式：postsynaptic L1 归一化目标（本项目提出；
+  targetInput: 3.0,        // per-neuron 模式：postsynaptic L1 归一化目标（本项目采用；
                            // 与 Shiu et al. 2024 的每突触固定系数 w_syn=0.275·mV 全局方案
                            // 不同，勿混引。实测 1.0 时信号只能到达蘑菇体、2.0 仍无法驱动
                            // 下行神经元，3.0 全链路可通且无癫痫式饱和，4.0 则全脑点燃
@@ -101,7 +101,7 @@ export class LIFSim {
 
     // 第二遍：填充 colIdx/values 并归一化权重。
     // per-neuron（默认）：postsynaptic L1 归一化——每个突触后神经元的总入权重 |w|
-    //   归一化为 targetInput，保留拓扑相对强弱。该方案由本项目提出（Shiu et al.
+    //   归一化为 targetInput，保留拓扑相对强弱。该方案由本项目采用（Shiu et al.
     //   2024 官方代码用的是每突触固定系数 w_syn=0.275·mV 的全局方案，两者不同）。
     //   实测参考实现的全局 max|w|→0.15 在参考增益下无法传播信号（个别 2405 的
     //   极端突触计数压扁了中位数仅 8 的常规权重），因此默认改用此模式，详见

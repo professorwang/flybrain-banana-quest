@@ -24,3 +24,4 @@ desktop.ini
 
 # 符号翻转实验变体数据（可用 python game/tools/flyb_to_bin.py --glut-excitatory 重建）
 game/data/connectome-malecns-glutexc.bin.gz
+game/data/connectome-flywire-glutinh.bin.gz

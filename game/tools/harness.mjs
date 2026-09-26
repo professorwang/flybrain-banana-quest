@@ -82,6 +82,9 @@ export function runEpisode({ sim, pools, extra, seconds = 120, cfgOverride = nul
     const game = new Game(pools, extra);
     if (cfgDefaults) Object.assign(game.cfg, cfgDefaults);   // 数据集级默认（可被 cfgOverride 覆盖）
     if (cfgOverride) Object.assign(game.cfg, cfgOverride);
+    // 显式 "bananaMaxDist": null = 恢复历史无上限（复现 v3 前扫参结果的入口，见
+    // TECH-NOTE §7 与 REVIEW-RESPONSE；JSON 无法表达 Infinity 故用 null 约定）
+    if (game.cfg.bananaMaxDist === null) game.cfg.bananaMaxDist = Infinity;
     game.placeBanana();
     const initialDist = Math.hypot(game.banana.x - game.fly.x, game.banana.y - game.fly.y);
 

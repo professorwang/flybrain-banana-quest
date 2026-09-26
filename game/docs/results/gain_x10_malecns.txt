@@ -1,4 +1,8 @@
-# global-max 增益复测（评审 R6）——MaleCNS，协议同 probe_flywire 探针5
-# 命令：node --input-type=module -e （见 docs/results/ 同目录本日志头部）
+# [已取代 superseded] 本日志为 v3 时期 inline `node -e` 探针的输出，保留作历史记录。
+# 当前等价入口（v4 固化脚本，双数据集一次跑完）：
+#   node game/tools/probe_gain.mjs        （存档：docs/results/probe_gain.txt）
+# 协议：global-max 归一化，values 增益 ×1/×10（0.15→1.5），olf_left 0.5×100 tick。
+# 时效字段（ms/tick）随机波动，不承诺逐字节一致；放电计数可复现。
+
 MaleCNS gain 0.15 x1 | 总放电 21867 | 感觉 21867 | 中枢 0 | 运动 0
 MaleCNS gain 0.15 x10 | 总放电 26010 | 感觉 25866 | 中枢 131 | 运动 13

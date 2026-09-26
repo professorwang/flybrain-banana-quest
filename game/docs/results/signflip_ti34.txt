@@ -1,6 +1,10 @@
-# 符号翻转实验（R1 替代假说的直接检验）：MaleCNS 标准版 vs GLUT 兴奋变体
-# 变体构建：python game/tools/flyb_to_bin.py --glut-excitatory（29,763 个谷氨酸能神经元符号 -1 -> +1）
-# 探针协议：olf_left I=1.0 x 200 tick，per-neuron 归一化
+# [已取代 superseded] 本日志为 v3 时期 inline `node -e` 符号翻转探针的输出，保留作历史记录。
+# 当前等价入口（v4 固化脚本，双向一次跑完）：
+#   python game/tools/flyb_to_bin.py --glut-excitatory   # 先重建 MaleCNS glut 兴奋变体
+#   python game/tools/build_flywire_variant.py           # FlyWire glut 抑制变体（含等价性自检）
+#   node game/tools/probe_signflip.mjs                   # 存档：docs/results/probe_signflip.txt
+# 协议：postsynaptic L1 归一化，olf_left I=1.0 × 200 tick。
+# 时效字段（ms/tick）随机波动，不承诺逐字节一致；放电计数可复现。
 
 标准版(glut抑制) ti=3 | 总放电 235638 | DN 11 | VIS_OL 0 | avgTick 3.2ms
    Top4: MB_KC:84437 OLF_ORN:72876 CB_INTRINSIC:37091 OLF_PN:15664

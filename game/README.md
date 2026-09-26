@@ -126,7 +126,7 @@ game/
 
 - LIF 是点神经元简化模型：无电导、无突触延迟、无神经调质、无可塑性。
 - 权重用 **postsynaptic L1 归一化**（每个突触后神经元总入权重归一化为
-  `targetInput=3.0`）。该方案由本项目提出；Shiu et al. 2024 官方代码
+  `targetInput=3.0`）。该方案由本项目采用；Shiu et al. 2024 官方代码
   （philshiu/Drosophila_brain_model）用的是每突触固定系数 `w_syn=0.275·mV`
   的全局方案，两者不同，v3 起不再混引。
   调参记录：全局 max|w|→0.15（参考实现原样）在本数据上信号无法传出触角神经叶

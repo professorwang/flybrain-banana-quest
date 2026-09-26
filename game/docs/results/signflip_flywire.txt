@@ -1,0 +1,14 @@
+# FlyWire 反向符号实验（必要性检验）：标准版(glut兴奋) vs 变体(glut抑制)
+# 变体构建：python game/tools/build_flywire_variant.py（等价性自检：重建标准版与
+#   shipped connectome.bin.gz 2,698,236 边逐边一致；变体边数 2,698,753，差 +517 为符号
+#   翻转后抵消关系改变所致）
+# 探针协议：olf_food_left I=1.0 x 200 tick，postsynaptic L1 归一化
+
+标准版(glut兴奋) ti=3 | 总放电 447219 | GNG_DESC 3810 | VIS_ME 2860 | avgTick 4.6ms
+   Top4: GENERIC_CENTRAL:181631 MB_KC:103093 OLF_ORN_FOOD:58033 CX_PFN:30722
+标准版(glut兴奋) ti=4 | 总放电 1265998 | GNG_DESC 25730 | VIS_ME 405788 | avgTick 6.9ms
+   Top4: GENERIC_CENTRAL:413687 VIS_ME:405788 MB_KC:144704 OLF_ORN_FOOD:53466
+变体(glut抑制) ti=3 | 总放电 222036 | GNG_DESC 30 | VIS_ME 0 | avgTick 3.1ms
+   Top4: MB_KC:97835 OLF_ORN_FOOD:59418 GENERIC_CENTRAL:33410 OLF_PN:10858
+变体(glut抑制) ti=4 | 总放电 291831 | GNG_DESC 113 | VIS_ME 0 | avgTick 3.3ms
+   Top4: MB_KC:134560 GENERIC_CENTRAL:55931 OLF_ORN_FOOD:55521 LH_APP:15017
