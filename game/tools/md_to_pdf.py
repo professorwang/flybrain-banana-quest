@@ -311,14 +311,14 @@ def build(md_path: str, pdf_path: str) -> dict:
         canv.saveState()
         canv.setFont(body, 7.5)
         canv.setFillColor(colors.HexColor("#777788"))
-        canv.drawString(2.5 * cm, 1.35 * cm, "Banana Quest technical note v4.1 (2026-09-27)")
+        canv.drawString(2.5 * cm, 1.35 * cm, "Banana Quest technical note v5 (2026-09-27)")
         canv.drawRightString(A4[0] - 2.5 * cm, 1.35 * cm, f"Page {doc.page}")
         canv.restoreState()
 
     doc = SimpleDocTemplate(pdf_path, pagesize=A4,
                             leftMargin=2.5 * cm, rightMargin=2.5 * cm,
                             topMargin=2.5 * cm, bottomMargin=2.2 * cm,
-                            title="Banana Quest technical note v4.1",
+                            title="Banana Quest technical note v5",
                             author="fruitfly/game")
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return stats

@@ -18,6 +18,7 @@ const COMBOS = [
   { note: '香蕉≤250（现默认）', cfg: {} },
   { note: '快速搜索（speedGain 0.8/maxSpeed 60）', cfg: { bananaMaxDist: null, speedGain: 0.8, maxSpeed: 60 } },
   { note: '香蕉≤250+快速', cfg: { speedGain: 0.8, maxSpeed: 60 } },
+  { note: '历史冠军 turnGain=1.8（样本外种子）', cfg: { turnGain: 1.8, bananaMaxDist: null } },
 ];
 
 const median = (a) => {

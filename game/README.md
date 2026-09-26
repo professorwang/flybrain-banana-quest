@@ -224,5 +224,5 @@ python game/tools/prepare_pools.py
 ## 许可
 
 - 游戏代码：MIT（与上游 snedea/flybrain 保持一致）。
-- 连接组数据：FlyWire，**CC BY-NC-SA 4.0**，仅限非商业用途。
+- 连接组数据：FlyWire，**CC BY-NC 4.0**，仅限非商业用途。
 - 详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

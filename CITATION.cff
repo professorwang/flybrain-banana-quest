@@ -11,7 +11,7 @@ url: "https://professorwang.github.io/flybrain-banana-quest/"
 license: MIT
 version: "0.2.0"
 date-released: "2026-09-25"
-notes: "Game code MIT; FlyWire connectome data CC BY-NC-SA 4.0 (non-commercial); see THIRD_PARTY_NOTICES.md."
+notes: "Game code MIT; FlyWire connectome data CC BY-NC 4.0 (non-commercial); see THIRD_PARTY_NOTICES.md."
 keywords:
   - Drosophila
   - connectome

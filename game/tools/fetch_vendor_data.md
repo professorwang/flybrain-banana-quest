@@ -10,7 +10,7 @@ git clone https://github.com/snedea/flybrain vendor/snedea-flybrain
 git -C vendor/snedea-flybrain checkout 9191824d17871b7851645782d53d23f213ddb938
 ```
 
-数据许可证：FlyWire 连接组本体 CC BY-NC-SA 4.0（Dorkenwald et al. 2024, *Nature*）。
+数据许可证：FlyWire 连接组本体 CC BY-NC 4.0（Dorkenwald et al. 2024, *Nature*）。
 
 | 文件 | SHA-256 |
 |---|---|

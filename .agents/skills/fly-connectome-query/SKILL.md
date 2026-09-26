@@ -26,7 +26,7 @@ whenToUse: 用户想实际查询果蝇神经元、细胞类型、突触连接、
 - **FlyWire/Codex**：免费；Google 账户登录（无 Google 账户邮件 flywire@princeton.edu 申请）；编程走 CAVE，认证为全局 token，首次用 `client.auth.setup_token()`。
 - **neuPrint**：免费、CC-BY；Google 账户登录后在账户页取 **auth token**。
 - **VFB**：免费、无需登录即可浏览。
-- 许可提醒：FlyWire 数据 CC BY-NC-SA 4.0（商用受限，条款以官网为准）；MaleCNS CC BY 4.0。
+- 许可提醒：FlyWire 数据 CC BY-NC 4.0（商用受限，2026-09-27 官网现行文本）；MaleCNS CC BY 4.0。
 
 ## 第三步：最小查询示例（仅用素材已核实代码）
 

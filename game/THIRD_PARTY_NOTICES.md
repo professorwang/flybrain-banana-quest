@@ -57,12 +57,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## 2. FlyWire 连接组数据（CC BY-NC-SA 4.0）
+## 2. FlyWire 连接组数据（CC BY-NC 4.0）
 
 连接组拓扑源自 FlyWire 全脑连接组（FAFB v783 版本），139,255 个神经元。FlyWire
-数据以 **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
-(CC BY-NC-SA 4.0)** 协议发布——**仅限非商业用途**，引用请注明出处，衍生作品须以
-相同协议共享。许可证全文：https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+官方 guidelines 现行文本为 "public release data is made available under license
+**CC BY-NC 4.0**"（Creative Commons Attribution-NonCommercial 4.0 International）——
+**仅限非商业用途**，引用请注明出处。许可证全文：
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
+（沿革：本项目早期版本误写为 CC BY-NC-SA 4.0，2026-09-27 第四轮复审时按官方
+现行文本更正为 CC BY-NC 4.0。）
 
 建议引用：
 
@@ -78,7 +81,9 @@ SOFTWARE.
 
 - Shiu, P. K., Sterne, G. R., Engert, F., et al. (2024). A Drosophila
   computational brain model reveals sensorimotor processing. *Nature*.
-  （按突触后神经元总输入归一化权重的 LIF 全脑模型）
+  （官方代码用每突触固定系数 w_syn=0.275·mV 的全局权重方案；本项目采用的
+  postsynaptic L1 归一化与之不同，为项目自选的工程方案——早期版本曾误将
+  后者归于 Shiu 模型，已更正。）
 
 ## 3. 免责
 
