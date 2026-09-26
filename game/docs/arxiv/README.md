@@ -39,12 +39,12 @@ python game/docs/arxiv/check_us.py    # 应输出 0 命中
 
 ## 已知注意点
 
-- 本目录产出时**本机 MiKTeX 正在后台安装**（主代理稍后做编译验收）；交付前已用
-  静态自查替代验证（全部通过）。首次编译如遇告警，常见候选：长 `\url{}` 断行
+- **本地编译已验收**（2026-09-27，MiKTeX xelatex 两遍）：8 页、字体全嵌入、无错误；
+  唯一 Overfull 为 0.45pt（不可见）。首次编译如遇告警，常见候选：长 `\url{}` 断行
   （必要时加载 `xurl`）、§7 复现表长命令串（已用 `\footnotesize` + `sloppypar`
-  + 固定 `p{}` 列宽处理）。
-- `__COMMIT__` 占位符（标题行与 §7 各一处引用，正文实际出现两次：标题行与
-  Reproducibility 的 commit lineage）在仓库侧由主代理提交时回填。
+  + 固定 `p{}` 列宽 + 手动断行处理）。
+- 版本占位符已回填：标题行与 §7 commit lineage 中的本版提交号为 `99ed490`
+  （v5 支撑材料提交；v5.1 终审小修见 git log）。
 - 参考文献用 `thebibliography` 手工环境（14 条，与 md 版一致），未用 BibTeX——
   arXiv 直传 main.tex 即可，无需 .bbl。
 - 表格为 booktabs 风格；正文数字与 md 版 v5 逐项一致（若 md 再修订，请同步本

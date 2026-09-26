@@ -317,7 +317,7 @@ game/README.md 调参记录"。
 - c) `fetch_vendor_data.md` 改用 `git -C … checkout …` 形式，校验示例修正为
   `sys.argv[1]`（原示例遗留未定义变量 `p`）；
 - d) md_to_pdf 标题区 Repository 行去掉硬编码旧 hash（仅留仓库 URL；commit 沿革
-  由 md 版本行呈现，本版占位符 `80a4768` 待主代理回填）。
+  由 md 版本行呈现，本版提交号已回填为 `80a4768`）。
 
 ## 附：v4.1 全部改动文件
 
@@ -345,7 +345,8 @@ game/README.md 调参记录"。
 + `\setCJKsansfont{FandolHei-Regular.otf}`；§7 复现表加 `\footnotesize` +
 `sloppypar` 防长命令串溢出；arxiv/README 写明 arXiv 用 XeLaTeX + Fandol、Overleaf
 备选方案与自检命令的正确路径（`python game/docs/arxiv/check_tex.py`，仓库根目录）。
-本机 MiKTeX 安装中，编译验收由主代理执行（遗留项）。
+**编译验收已完成**（2026-09-27，主代理本机 MiKTeX xelatex 两遍）：8 页、无错误、
+字体全嵌入，溢出修正后仅余 0.45pt 一处（不可见）。
 
 ## U2 R7 冠军样本外入口
 
@@ -406,3 +407,37 @@ MaleCNS data CC BY 4.0"，notes 同步）、`CITATION.cff`、`game/THIRD_PARTY_N
   `game/README.md`、`game/index.html`、`game/tools/fetch_vendor_data.md`、
   `docs/media/zhihu-article.md`
 - `game/docs/TECH-NOTE.pdf`（v5 重出）
+
+---
+
+# 终审（v5 → v5.1）：五处小修
+
+> 终审结论：核心研究通过，投稿前有限小修，不需要新增实验。以下逐条答复（2026-09-27）。
+
+## F1 §2.3 文表矛盾
+
+**意见**：正文称 ti=2 两数据集均未到达下行神经元，但表中 FlyWire 在 ti=2 已有 10 次
+GNG_DESC 放电。**处理**：改写为分数据集描述起点（ti=2 FlyWire 首现 10 次、MaleCNS 为 0；
+ti=3 FlyWire 可用、MaleCNS 刚到；ti=4 MaleCNS 可用）。md 与 LaTeX 同步。
+
+## F2 上游比较不准确
+
+**意见**：上游 VALIDATION.md §9 已有定量增益表，本文"上游仅定性"的比较不成立。
+**处理**：删除 "gain dependence" 比较项（md 与 LaTeX 同步），双向干预贡献不受影响。
+
+## F3 复现命令占位符
+
+**意见**：`<grid JSON with …>` 与 `<champion grid JSON>` 不可执行。**处理**：恢复完整命令
+（sweep 两轮与冠军配置的完整 JSON，含 `"bananaMaxDist":[null]`）；LaTeX 侧为防溢出手动断行。
+R7 至此应可关闭。
+
+## F4 提交号漏填
+
+**意见**：main.tex 标题行与 PDF 首页仍是占位符。**处理**：已回填 `99ed490`（v5 支撑材料提交号），
+重新编译 main.pdf；README 与答复信中"MiKTeX 安装中/待回填"的旧状态行已更新为验收结论。
+
+## F5 两处总结超出实验范围
+
+**意见**："静默是默认结果，不是刺激错误"需限定。**处理**：两处改为"本文两个数据包、指定刺激、
+参考增益下未出现中枢传播，先把静默当检查项而非刺激错误"；"robustly helped"改为
+"在所测种子上改善表现"（md 与 LaTeX 同步）。
