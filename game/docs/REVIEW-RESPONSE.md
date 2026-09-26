@@ -149,3 +149,108 @@ ti=4 不自动等于统计充分；并声明两数据集游戏内转向仍需基
 - `game/src/sim-core.js`（归一化注释更正）、`game/README.md`、`game/index.html`
   （同款表述更正）
 - `game/docs/results/`（4 份运行存档）
+
+---
+
+# 第二轮（v3 → v4）：复审答复
+
+> 复审结论：符号翻转实验经独立重建复现通过（331,336/75/2 与 1,797,262/19,004/553,863），
+> R1–R7 未全部关闭。以下逐条答复。致谢：复审指出的 histamine 事实错误、"全部命令补齐"
+> 的言过其实、算式不严谨三处，我们核实后全部认错并改正。
+
+## S1 histamine 符号表（认错更正）
+
+**意见**：FlyWire 包 NT_SIGN 无 histamine 项，v3"两包均将 histamine 设为抑制"错误。
+
+**核实**：属实。vendor/snedea-flybrain/scripts/build_connectome.py:104-111 的 NT_SIGN 仅
+{ACH, GLUT, DA, OA, SER, GABA}，histamine 走 unknown 默认 +1（兴奋）；仅 MaleCNS 包明确
+histamine −1。**修改位置**：§5.1 符号对照改为四行表（ACH 均兴奋；GLUT FlyWire 兴奋/
+MaleCNS 抑制；histamine FlyWire 无配置默认兴奋/MaleCNS 抑制；GABA 均抑制），并注明
+光受体（组胺能）直接受影响。
+
+## S2 "introduced in this project" 措辞
+
+**意见**：归一化方案命名仍暗示原创。
+
+**处理**：全文改 **"postsynaptic L1 normalization (adopted in this project)"**，
+中文"本项目提出"→"本项目采用"（摘要、§2.2、sim-core.js 注释、README、index.html）。
+
+## S3 残留绝对表述与跨数据集推断
+
+**意见**：仍有 "every steering decision" 类表述；§5.4 由 MaleCNS 上行神经元嗅觉零响应
+推出 FlyWire GNG_DESC 响应"非上行成分"是跨数据集推断。
+
+**处理**：§1 改为 "participates in steering and in feeding gating"；§5.4 删除该推断，
+MaleCNS AN 零响应仅作为 MaleCNS 观察保留，并显式声明"FlyWire 上行成分贡献**尚未验证**"。
+
+## S4 侧向差算式
+
+**意见**："0.580 − 0.485 = 0.0949" 算术不成立，应写精确分数。
+
+**处理**：§5.4 改 **`91/157 − 111/229 ≈ 0.09490`（9.49 个百分点）**。
+
+## S5 EMA 读出措辞
+
+**意见**："去除偏置""跟踪当前梯度""必要"等措辞无消融支持。
+
+**处理**：§3.2 全节改为 **"heuristic high-pass readout（本项目采用的启发式高通读出）"**，
+明确不声称去除偏置、不提供"真实"侧向信号，τ 扫描为唯一消融；§3.3/§5.4/§6 同步。
+
+## S6 Finding 3 表述
+
+**意见**："systematically overfit" 过强；首吃时间统计口径未披露；turnGain 反例需写全参数。
+
+**处理**：摘要改为具体观察（冠军配置在 10 个样本外种子上未保持优势）；§4.1 披露
+**首吃统计只计成功 episode**；反例写全：固定 σ250、baseSpeed 12，gain 2.6→4 时
+平均分 1.80→2.20（上升）。另按复审实测补充配置可复现性说明：冠军 3.00 系历史
+bananaMaxDist=∞ 下测得，当前默认 250 下为 2.20，显式恢复历史值得 3.00（我们已复核，
+与复审数字一致）。
+
+## S7 符号翻转结论收窄 + 反向实验
+
+**意见**：v3 结论"符号规则解释跨数据集差异"超出证据（必要性未在 FlyWire 上确立）；
+"seizure-prone" 等术语未定义。
+
+**处理**：① 术语改为可测量表述（"high visual-lobe activity"）；② 完成反向实验——
+新脚本 `game/tools/build_flywire_variant.py` 从 FlyWire 源 CSV 重建（**等价性自检：
+标准符号重建与 shipped connectome.bin.gz 2,698,236 边逐边一致、0 不匹配**），
+生成 glut 抑制变体（+517 边，符号翻转改变抵消关系所致）。探针结果
+（`node game/tools/probe_signflip.mjs`，存档 `docs/results/signflip_flywire.txt`）：
+
+| 变体 | ti | 总放电 | GNG_DESC | VIS_ME |
+|---|---|---|---|---|
+| FlyWire 标准（glut 兴奋） | 3 | 447,219 | 3,810 | 2,860 |
+| FlyWire 标准 | 4 | 1,265,998 | 25,730 | 405,788 |
+| FlyWire glut 抑制 | 3 | 222,036 | 30 | **0** |
+| FlyWire glut 抑制 | 4 | 291,831 | 113 | **0** |
+
+结论按复审措辞收窄后双向闭环：**在固定 MaleCNS 图上仅翻转 GLUT 符号足以引起大量
+视叶活动（充分性）；在固定 FlyWire 图上反向翻转则消除该活动（405,788→0，必要性）
+——在所测两图与本刺激条件下，谷氨酸符号赋值对该高活动表型既充分又必要**；同时
+明确这不证明符号表解释全部跨数据集差异（驱动不对称、解剖、过滤仍不同）（§5.3）。
+
+## S8 R7 复现入口（"全部命令补齐"言过其实，认错并落实）
+
+**意见**：inline 探针应固化；存档头部缺完整命令；29.6s 无种子；历史扫参缺显式配置；
+缺 vendor 固定步骤；v3 信中"逐字节可复现"过度承诺。
+
+**处理**：① 新建 `game/tools/probe_gain.mjs`、`game/tools/probe_signflip.mjs`（双向
+一次跑完），inline 残迹两份存档头部标注"已取代 + 当前入口"；② FlyWire 闭环改用显式
+种子重跑：**seed 7 首吃 34.8s**（替换原无种子 29.6s 记录）；③ harness 支持
+`"bananaMaxDist":[null]`（=历史无上限），历史扫参命令全部带显式覆盖；冠军行验证
+250→2.20 / null→3.00（与复审一致）；④ 新建 `game/tools/fetch_vendor_data.md`
+（两上游仓库固定 commit + 全部数据文件 SHA-256，含 flyb.gz 与上游 PROVENANCE 一致的
+e33df182…）；⑤ 时效字段（ms/tick）声明随机波动、不承诺逐字节，放电计数可复现；
+PDF 页数收回 9 页内。
+
+## 附：v4 全部改动文件
+
+- `game/docs/TECH-NOTE.md`（v4）；`game/docs/REVIEW-RESPONSE.md`（本信追加第二轮）
+- `game/tools/probe_gain.mjs`、`game/tools/probe_signflip.mjs`、
+  `game/tools/build_flywire_variant.py`、`game/tools/fetch_vendor_data.md`（新建）
+- `game/tools/harness.mjs`（bananaMaxDist null 约定）、`game/tools/md_to_pdf.py`
+  （v4 页脚/标题）
+- `game/data/connectome-flywire-glutinh.bin.gz`（变体，可由脚本重建）
+- `game/docs/results/`（probe_gain.txt、probe_signflip.txt、signflip_flywire.txt 新增；
+  gain_x10_malecns.txt、signflip_ti34.txt 头部标注已取代）
+- `game/src/sim-core.js`、`game/README.md`、`game/index.html`（"采用"措辞同步）
