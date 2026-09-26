@@ -169,7 +169,7 @@ def parse_flyb(path: Path):
     sup = raw[off:off + N]; off += N
     cls = raw[off:off + N]; off += N
     sub = struct.unpack_from(f"<{N}H", raw, off); off += 2 * N
-    off += N  # ntIdx（符号已在 ntSign，权重折叠只用 sign）
+    nt_idx = raw[off:off + N]; off += N
     sign = struct.unpack_from(f"<{N}b", raw, off)
     off += N
     side = raw[off:off + N]; off += N
@@ -188,7 +188,7 @@ def parse_flyb(path: Path):
     return {
         "N": N, "E": E, "dataset": dataset, "tables": tables,
         "body_ids": body_ids, "type_idx": type_idx, "sup": sup, "cls": cls,
-        "sub": sub, "sign": sign, "side": side,
+        "sub": sub, "sign": sign, "side": side, "nt_idx": nt_idx,
         "row_ptr": row_ptr, "post_idx": post_idx, "weight": weight,
     }
 
@@ -196,6 +196,11 @@ def parse_flyb(path: Path):
 # ---------------- 主流程 ----------------
 
 def main() -> None:
+    # --glut-excitatory：生成"谷氨酸兴奋性"变体（直接检验符号规则假说：
+    # FlyWire 打包把 GLUT 当兴奋性、MaleCNS 打包当抑制性，§5.3 视觉点燃差异的
+    # 候选解释。变体只改符号、其余不变，输出 connectome-malecns-glutexc.bin.gz，
+    # 组与池定义与标准版完全一致（pools_malecns.json 可直接复用）。）
+    glut_exc = "--glut-excitatory" in sys.argv
     d = parse_flyb(FLYB)
     N, E = d["N"], d["E"]
     T = d["tables"]["types"]
@@ -203,6 +208,17 @@ def main() -> None:
     C = d["tables"]["classes"]
     SB = d["tables"]["subclasses"]
     SD = d["tables"]["sides"]
+    if glut_exc:
+        nts = d["tables"]["nts"]
+        glut_idx = nts.index("glutamate")
+        sign = list(d["sign"])
+        flipped = 0
+        for i in range(N):
+            if d["nt_idx"][i] == glut_idx and sign[i] < 0:
+                sign[i] = 1
+                flipped += 1
+        d["sign"] = sign
+        print(f"[变体] GLUT 翻转为兴奋性：{flipped} 个谷氨酸能神经元", file=sys.stderr)
 
     sup_s = [S[i] for i in d["sup"]]
     cls_s = [C[i] for i in d["cls"]]
@@ -221,7 +237,8 @@ def main() -> None:
 
     # 2. 写 connectome-malecns.bin.gz（边按 CSR 序 = 按 pre 排序；w = 计数 × ntSign[pre]）
     OUT.mkdir(parents=True, exist_ok=True)
-    bin_path = OUT / "connectome-malecns.bin.gz"
+    bin_path = OUT / ("connectome-malecns-glutexc.bin.gz" if glut_exc
+                      else "connectome-malecns.bin.gz")
     row_ptr, post_idx, weight, sign = d["row_ptr"], d["post_idx"], d["weight"], d["sign"]
     buf = bytearray(8 + E * 12)
     struct.pack_into("<II", buf, 0, N, E)
@@ -251,6 +268,9 @@ def main() -> None:
     print(f"[weights] max={max_w} 抽样{len(sample)}条: p50={pct(0.5)} p90={pct(0.9)} p99={pct(0.99)}",
           file=sys.stderr)
     print(f"写出 {bin_path} ({bin_path.stat().st_size / 1024 / 1024:.1f} MB)", file=sys.stderr)
+    if glut_exc:
+        # 变体只需二进制（组与池定义与标准版一致，无需重写 meta/pools）
+        return
 
     # 3. neuron_meta_malecns.json
     meta = {

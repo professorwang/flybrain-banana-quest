@@ -103,7 +103,7 @@ game/
 │   └── tune_sweep.mjs      游戏层参数网格扫参
 ├── docs/
 │   ├── TECH-NOTE.md        英文技术报告：归一化失败、结构偏置与调参教训
-│   └── malecns-probes.md   MaleCNS 复测数据（技术报告 v2 素材）
+│   └── malecns-probes.md   MaleCNS 复测数据（技术报告素材；解读以 TECH-NOTE v3 为准）
 └── test/sim.test.mjs       Node 烟雾测试
 ```
 
@@ -125,7 +125,10 @@ game/
 **简化与人工选取的部分**
 
 - LIF 是点神经元简化模型：无电导、无突触延迟、无神经调质、无可塑性。
-- 权重按**突触后神经元总输入归一化**（`targetInput=3.0`，Shiu et al. 2024 思路）。
+- 权重用 **postsynaptic L1 归一化**（每个突触后神经元总入权重归一化为
+  `targetInput=3.0`）。该方案由本项目提出；Shiu et al. 2024 官方代码
+  （philshiu/Drosophila_brain_model）用的是每突触固定系数 `w_syn=0.275·mV`
+  的全局方案，两者不同，v3 起不再混引。
   调参记录：全局 max|w|→0.15（参考实现原样）在本数据上信号无法传出触角神经叶
   （个别 2405 的极端突触计数把中位数 8 的常规权重压到阈值千分之一以下）；
   每神经元归一化 1.0 只到蘑菇体，2.0 到不了下行神经元，3.0 全链路可通且

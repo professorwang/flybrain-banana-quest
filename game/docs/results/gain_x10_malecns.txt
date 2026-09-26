@@ -1,0 +1,4 @@
+# global-max 增益复测（评审 R6）——MaleCNS，协议同 probe_flywire 探针5
+# 命令：node --input-type=module -e （见 docs/results/ 同目录本日志头部）
+MaleCNS gain 0.15 x1 | 总放电 21867 | 感觉 21867 | 中枢 0 | 运动 0
+MaleCNS gain 0.15 x10 | 总放电 26010 | 感觉 25866 | 中枢 131 | 运动 13

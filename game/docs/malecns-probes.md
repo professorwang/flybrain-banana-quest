@@ -1,5 +1,12 @@
 # MaleCNS 跨数据集探针记录（TECH-NOTE 三发现的 MaleCNS 复测）
 
+> **v3 更正提示（2026-09-26）**：本文测量数字仍然有效且可复现，但两处解读已被
+> TECH-NOTE v3 取代：①"MaleCNS 独有 ≥5 突触过滤"有误——经复核两个数据集均为 ≥5
+> 过滤（v3 §5.1）；②"≥5 过滤使 MaleCNS 抗癫痫"的归因已撤回——v3 符号翻转实验证明
+> 差异源于两打包的递质符号规则（GLUT 兴奋 vs 抑制，v3 §5.3）。解读以
+> [TECH-NOTE.md](TECH-NOTE.md) v3 为准；评审点对点答复见
+> [REVIEW-RESPONSE.md](REVIEW-RESPONSE.md)。
+
 > 日期：2026-09-26。数据集：neuPrint **male-cns:v1.0**（176,422 神经元 / 6,287,749 条
 > ≥5 突触连接 / 90,296,905 突触；CC BY 4.0），经 vendor/fly-brain-minecraft 的
 > FLYB v1 封装（MIT），由 `game/tools/flyb_to_bin.py` 转为 sim-core 格式三件套。

@@ -1,0 +1,36 @@
+## 探针 1：权重分布（原始突触计数，|w|）
+
+| max | median | p90 | p99 | 非零最小 | 样本数 |
+|---|---|---|---|---|---|
+| 2405 | 8 | 23 | 77 | 1.0000 | 25218 / 2698236 |
+
+## 探针 2：Finding 1 —— global-max（参考增益 0.15，0.5 × 100 tick 刺激 olf_food_left）
+
+| 总放电 | 感觉区 | 中枢 | 运动区 | OLF_PN 最大V | avg tick |
+|---|---|---|---|---|---|
+| 18525 | 18525 | 0 | 0 | 0.780 | 1.3 ms |
+
+## 探针 3：targetInput 扫描（I=1.0 × 200 tick 刺激 olf_food_left）
+
+| targetInput | 总放电 | 到达组 Top6 | GNG_DESC(组35) | VIS_ME(组2，癫痫指标) | avg tick |
+|---|---|---|---|---|---|
+| 1 | 68654 | OLF_ORN_FOOD:62299 MB_KC:2544 OLF_PN:2054 OLF_LN:694 GENERIC_CENTRAL:687 LH_APP:226 | 0 | 0 | 2.3 ms |
+| 2 | 161330 | OLF_ORN_FOOD:60296 MB_KC:57446 GENERIC_CENTRAL:23751 OLF_PN:7586 LH_APP:7165 OLF_LN:3221 | 10 | 0 | 2.2 ms |
+| 3 | 447219 | GENERIC_CENTRAL:181631 MB_KC:103093 OLF_ORN_FOOD:58033 CX_PFN:30722 CX_HDELTA:16844 LH_APP:13819 | 3810 | 2860 | 2.9 ms |
+| 4 | 1265998 | GENERIC_CENTRAL:413687 VIS_ME:405788 MB_KC:144704 OLF_ORN_FOOD:53466 CX_PFN:51394 VIS_R1R6:36472 | 25730 | 405788 | 4.5 ms |
+
+## 探针 4：Finding 2 —— 单侧嗅觉刺激的 desc 池偏置（ti=3.0, I=1.0 × 200 tick）
+
+| 刺激侧 | desc_left | desc_right | L/(L+R) | 首个 desc 放电 tick |
+|---|---|---|---|---|
+| olf_food_left | 1704 | 2106 | 0.447 | 9 |
+| olf_food_right | 1633 | 2133 | 0.434 | 9 |
+
+## 探针 5：global-max 增益复测（0.5 × 100 tick，增益系数 ×1/×10）
+
+| 增益系数 | 总放电 | 感觉区 | 中枢 | 运动区 |
+|---|---|---|---|---|
+| 0.15 × 1 | 18525 | 18525 | 0 | 0 |
+| 0.15 × 10 | 19201 | 19185 | 16 | 0 |
+
+探针完成。

@@ -1,0 +1,12 @@
+# 符号翻转实验（R1 替代假说的直接检验）：MaleCNS 标准版 vs GLUT 兴奋变体
+# 变体构建：python game/tools/flyb_to_bin.py --glut-excitatory（29,763 个谷氨酸能神经元符号 -1 -> +1）
+# 探针协议：olf_left I=1.0 x 200 tick，per-neuron 归一化
+
+标准版(glut抑制) ti=3 | 总放电 235638 | DN 11 | VIS_OL 0 | avgTick 3.2ms
+   Top4: MB_KC:84437 OLF_ORN:72876 CB_INTRINSIC:37091 OLF_PN:15664
+标准版(glut抑制) ti=4 | 总放电 331336 | DN 75 | VIS_OL 2 | avgTick 3.0ms
+   Top4: MB_KC:133067 OLF_ORN:69568 CB_INTRINSIC:68551 OLF_PN:21586
+变体(glut兴奋) ti=3 | 总放电 492145 | DN 1025 | VIS_OL 41 | avgTick 2.8ms
+   Top4: CB_INTRINSIC:200911 MB_KC:95053 OLF_ORN:72472 CX:62343
+变体(glut兴奋) ti=4 | 总放电 1797262 | DN 19004 | VIS_OL 553863 | avgTick 7.0ms
+   Top4: CB_INTRINSIC:567354 VIS_OL:553863 MB_KC:147373 VIS_VPN:114510
