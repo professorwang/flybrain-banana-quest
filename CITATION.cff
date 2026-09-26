@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: "Banana Quest: a browser foraging game driven by the full FlyWire whole-brain connectome (with a Chinese knowledge base on fly connectomics and whole-brain emulation)"
+message: "If you use this software or its technical notes, please cite it as below."
+type: software
+authors:
+  - family-names: Wang
+    given-names: Professor
+    alias: professorwang
+repository-code: "https://github.com/professorwang/flybrain-banana-quest"
+url: "https://professorwang.github.io/flybrain-banana-quest/"
+license: MIT
+version: "0.2.0"
+date-released: "2026-09-25"
+notes: "Game code MIT; FlyWire connectome data CC BY-NC-SA 4.0 (non-commercial); see THIRD_PARTY_NOTICES.md."
+keywords:
+  - Drosophila
+  - connectome
+  - FlyWire
+  - leaky integrate-and-fire
+  - whole-brain emulation
+  - browser simulation

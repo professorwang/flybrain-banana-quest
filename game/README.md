@@ -69,11 +69,20 @@ game/
 │   └── main.js             组装与主循环（游戏时钟与脑 tick 解耦）
 ├── tools/
 │   ├── prepare_pools.py    从 vendor 数据生成 pools.json（纯标准库）
-│   └── headless_run.mjs    无头闭环验证
+│   ├── harness.mjs         无头闭环共享库（loadWorld / runEpisode / LCG 种子）
+│   ├── headless_run.mjs    无头闭环验证（可选配置覆盖 JSON 与种子参数）
+│   └── tune_sweep.mjs      游戏层参数网格扫参
+├── docs/
+│   └── TECH-NOTE.md        英文技术报告：归一化失败、结构偏置与调参教训
 └── test/sim.test.mjs       Node 烟雾测试
 ```
 
+实测发现（归一化、结构偏置、种子过拟合）的完整英文技术报告见
+[docs/TECH-NOTE.md](docs/TECH-NOTE.md)。
+
 ## 科学说明（诚实清单）
+
+> 本节发现的详细数据与讨论已整理为英文技术报告：[docs/TECH-NOTE.md](docs/TECH-NOTE.md)。
 
 **真实的部分**
 
