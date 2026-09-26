@@ -254,3 +254,76 @@ PDF 页数收回 9 页内。
 - `game/docs/results/`（probe_gain.txt、probe_signflip.txt、signflip_flywire.txt 新增；
   gain_x10_malecns.txt、signflip_ti34.txt 头部标注已取代）
 - `game/src/sim-core.js`、`game/README.md`、`game/index.html`（"采用"措辞同步）
+
+---
+
+# 第三轮（v4 → v4.1）："小修后通过"定向修订答复
+
+> 复审结论：小修后通过，不需要追加实验。复审已独立重建反向变体并复跑八组符号实验
+> （25,730/405,788 vs 113/0、75/2 vs 19,004/553,863）、增益 16/131+13、seed 7 的 34.8s、
+> 冠军 3.00、7 个 SHA-256，全部吻合。剩三项有限修改 + 编辑清理，逐条如下。
+
+## T1 histamine 再更正（认错：v4 的修正本身有误）
+
+**意见**：v4 §5.1"histamine 无配置默认 +1、光受体直接受影响（8,021）"仍有事实错误。
+
+**核实**：我们对 vendor/snedea-flybrain/data/connections.csv.gz 逐行扫描 `nt_type`，
+3,869,878 行的标签集合**恰为六类**（唯一值清单，作为证据）：
+
+```
+ACH 2,258,155 | GABA 865,318 | GLUT 654,183 | DA 37,705 | SER 37,450 | OCT 17,067
+（无 histamine、无空标签）
+```
+
+即 FlyWire 的六类递质预测**本就不包含 histamine**，所有神经元（包括光受体）都被标为
+这六类之一，不存在"histamine 落入默认 +1"的数据行；8,021 是 MaleCNS 的 histamine
+标记节点总数，不是光受体数。v4 的两处表述（"默认 +1""光受体直接受影响"）均错误，
+认错。**修改位置**：§5.1 符号表 histamine 行改为 "not a predicted class in this
+dataset / −1 inhibitory (8,021 labeled nodes)"，正文改为"不能从缺少该预测类别，直接
+推断真实组胺能神经元在 FlyWire 包中的赋号"，删除光受体两句，并保留更正沿革
+（v3 错 → v4 错 → v4.1 正确）以示透明。
+
+## T2 反向实验精确化
+
+**意见**："fixed FlyWire graph" 不准确（干预改变了边集）；517 边/77,650 共同边权重/
+23,905 个 L1 分母应声明；"充分且必要"需限定条件范围。
+
+**处理**：§5.3 反向实验改为"固定源连接表，重新聚合并计算 L1 归一化"；新增 Scope
+note 脚注（517 条边差、77,650 条共同边权重、23,905 个 L1 分母为同一规则干预的后果，
+非额外混杂——数字采用复审所给）；"充分且必要"严格限定为 **ti=4、I=1、200 tick 及
+所比较的 GLUT 正/负两种配置**，ti=3 各行照实报告但明确不纳入结论范围。摘要与中文
+摘要同步收窄。
+
+## T3 最后两个复现入口
+
+**意见**：补充探针与样本外比较仍未固化。
+
+**处理**：① 新建 `game/tools/probe_supplementary.mjs`（进食/逃逸/上行三链，ti=4.0），
+运行输出与历史一致（feed 3/tick 22；DNp01 0、AN 710；AN 0、DN 75），存档
+`docs/results/probe_supplementary.txt`；② 新建 `game/tools/reproduce_sweeps.mjs`
+（4 配置 × 10 样本外种子 × 180s，显式 bananaMaxDist），输出**与历史表逐项一致**
+（49.6/27.3/38.6/42.6 中位；2.70/2.50/1.80/3.10 得分；曲折度同），存档
+`docs/results/reproduce_sweeps.txt`；§7 复现表替换两行，开头承诺收窄为"除注明历史
+记录外"——350px 对照行无法由脚本精确重建，已在 §7 明确标注"历史记录，配置见
+game/README.md 调参记录"。
+
+## T4 编辑清理
+
+- a) "asymptote" 类表述全部改为"100 ticks 内观察到的最大电压"（有限时长测量），
+  摘要/§2.1/§5.2 同步；
+- b) §4.2 快速搜索两组对照写全：快速组中位 38.6 < 49.6s 但成功率降至 9/10、得分
+  1.80；环带+快速中位 42.6 > 27.3s、得分 3.10（归因于漫游覆盖加速而非读出改进，
+  未采用）；
+- c) `fetch_vendor_data.md` 改用 `git -C … checkout …` 形式，校验示例修正为
+  `sys.argv[1]`（原示例遗留未定义变量 `p`）；
+- d) md_to_pdf 标题区 Repository 行去掉硬编码旧 hash（仅留仓库 URL；commit 沿革
+  由 md 版本行呈现，本版占位符 `80a4768` 待主代理回填）。
+
+## 附：v4.1 全部改动文件
+
+- `game/docs/TECH-NOTE.md`（v4.1）；`game/docs/REVIEW-RESPONSE.md`（本信追加第三轮）
+- `game/tools/probe_supplementary.mjs`、`game/tools/reproduce_sweeps.mjs`（新建）
+- `game/tools/fetch_vendor_data.md`（git -C 与校验示例修正）、`game/tools/md_to_pdf.py`
+  （v4.1 页脚/标题、去硬编码 hash、版式压缩）
+- `game/docs/results/`（probe_supplementary.txt、reproduce_sweeps.txt 新增）
+- `game/docs/arxiv/`（LaTeX 投稿源：main.tex + README.md）
