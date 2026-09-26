@@ -76,13 +76,14 @@ export class Game {
     this.startleTimer = 0;           // 惊吓持续刺激剩余时间
     this._startleBaseline = null;    // 惊吓前的 desc 放电率
     this._startleJudge = 0;          // 惊吓后 0.6s 判定时刻
-    // 读出环缓冲：每 tick 一格 {l, r, f}
+    // 读出环缓冲：每 tick 一格 {l, r, f, e}
     this.ring = [];
     this.emaL = 0;                   // desc 池放电率慢速基线
     this.emaR = 0;
     this.rateL = 0;                  // 当前 500ms 窗口放电率（spikes/s）
     this.rateR = 0;
     this.feedRate2s = 0;             // feed_readout 2s 窗口放电数
+    this.escapeRate1s = 0;           // escape 读出池（DNp01）1s 窗口放电数
     this._noiseSet = null;           // 背景噪声神经元（每次 buildStimulus 刷新）
   }
 
@@ -109,7 +110,7 @@ export class Game {
 
   /* ---- 脑 tick 数据入口（每个 worker tick 调用一次） ---- */
   onTick(readout, tickHz) {
-    this.ring.push({ l: readout.left, r: readout.right, f: readout.feed });
+    this.ring.push({ l: readout.left, r: readout.right, f: readout.feed, e: readout.escape || 0 });
     const win = Math.max(1, Math.round(tickHz * 0.5));   // 500ms 窗口
     const win2 = Math.max(1, Math.round(tickHz * 2));    // 2s 窗口
     if (this.ring.length > win2) this.ring.shift();
@@ -118,6 +119,9 @@ export class Game {
     this.rateL = tail.reduce((a, b) => a + b.l, 0) / dtWin;
     this.rateR = tail.reduce((a, b) => a + b.r, 0) / dtWin;
     this.feedRate2s = this.ring.reduce((a, b) => a + b.f, 0);
+    // escape 读出池（MaleCNS 的 DNp01 巨型纤维）1s 窗口放电数
+    const win1 = Math.max(1, Math.round(tickHz));
+    this.escapeRate1s = this.ring.slice(-win1).reduce((a, b) => a + b.e, 0);
   }
 
   /* ---- 每渲染帧调用：推进游戏世界 ---- */
@@ -136,13 +140,15 @@ export class Game {
     if (this.windTimer > 0) this.windTimer -= dt;
     if (this.startleTimer > 0) this.startleTimer -= dt;
 
-    // 惊吓后 0.6s 判定：desc 总放电是否飙升
+    // 惊吓后 0.6s 判定：escape 读出池（DNp01，若有）放电 或 desc 总放电飙升
     if (this._startleJudge > 0) {
       this._startleJudge -= dt;
       if (this._startleJudge <= 0 && this._startleBaseline !== null) {
         const now = this.rateL + this.rateR;
-        if (now > Math.max(this._startleBaseline * this.cfg.startleSurgeRatio,
-                           this._startleBaseline + 20)) {
+        const surge = now > Math.max(this._startleBaseline * this.cfg.startleSurgeRatio,
+                                     this._startleBaseline + 20);
+        const gfFired = this.pools.readout.escape && this.escapeRate1s >= 1;
+        if (surge || gfFired) {
           // 脑对惊吓有响应 → 逃离：随机急转 + 短时加速
           this.escaping = this.cfg.escapeTime;
           f.heading += (Math.random() < 0.5 ? -1 : 1) * (1.5 + Math.random());
@@ -234,8 +240,8 @@ export class Game {
       const bearing = wrapAngle(Math.atan2(dy, dx) - this.fly.heading);
       // canvas y 轴向下：bearing>0 即香蕉在果蝇右侧 → 右池更强
       const s = Math.max(-1, Math.min(1, bearing / (Math.PI / 2)));
-      this._pushPool(idx, ints, this.pools.input.olf_food_left, I * (0.5 - 0.5 * s));
-      this._pushPool(idx, ints, this.pools.input.olf_food_right, I * (0.5 + 0.5 * s));
+      this._pushPool(idx, ints, this.pools.input.olf_left, I * (0.5 - 0.5 * s));
+      this._pushPool(idx, ints, this.pools.input.olf_right, I * (0.5 + 0.5 * s));
     } else {
       // 无香蕉：微弱背景噪声（随机子集，明确标注为噪声）
       this._noiseSet = this._pickNoise();
@@ -244,26 +250,27 @@ export class Game {
 
     // 进食中：持续刺激甜味味觉受体
     if (this.feeding && this.eatAnim <= 0) {
-      this._pushPool(idx, ints, this.pools.input.gus_sweet,
+      this._pushPool(idx, ints, this.pools.input.gus,
         this.cfg.gusIntensity * (0.8 + 0.4 * this.hunger));
     }
 
     // 光照开：持续刺激视觉池
     if (this.light) {
-      this._pushPool(idx, ints, this.pools.input.vis_r1r6, 0.35 * this.inputGain);
+      this._pushPool(idx, ints, this.pools.input.vis, 0.35 * this.inputGain);
     }
 
-    // 饥饿驱动（人工接线：饥饿度直接注入 DRIVE_HUNGER 组）
+    // 饥饿驱动（人工接线：饥饿度直接注入驱动组；数据集无此组则跳过）
     if (this.extra.driveHunger && this.hunger > 0.05) {
       this._pushPool(idx, ints, this.extra.driveHunger, this.cfg.hungerDriveGain * this.hunger);
     }
 
-    // 惊吓/吹风的持续段
+    // 惊吓/吹风的持续段（吹风池：优先原生 mech_jo，否则用 extra.mechJo 组选取）
     if (this.startleTimer > 0) {
       this._pushPool(idx, ints, this.pools.input.mech_bristle, 0.8);
     }
-    if (this.windTimer > 0 && this.extra.mechJo) {
-      this._pushPool(idx, ints, this.extra.mechJo, 0.7);
+    const joPool = this.pools.input.mech_jo || this.extra.mechJo;
+    if (this.windTimer > 0 && joPool) {
+      this._pushPool(idx, ints, joPool, 0.7);
     }
 
     return { indices: Uint32Array.from(idx), intensities: Float32Array.from(ints) };
@@ -275,7 +282,7 @@ export class Game {
   }
 
   _pickNoise() {
-    const src = Math.random() < 0.5 ? this.pools.input.olf_food_left : this.pools.input.olf_food_right;
+    const src = Math.random() < 0.5 ? this.pools.input.olf_left : this.pools.input.olf_right;
     const out = new Uint32Array(this.cfg.noiseCount);
     for (let k = 0; k < out.length; k++) out[k] = src[(Math.random() * src.length) | 0];
     return out;

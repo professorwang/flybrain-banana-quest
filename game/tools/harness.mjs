@@ -6,30 +6,49 @@ import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { LIFSim } from '../src/sim-core.js';
-import { Pools } from '../src/pools.js';
+import { Pools, FLYWIRE_KEYS, MALECNS_KEYS } from '../src/pools.js';
 import { Game } from '../src/game.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA_DIR = join(here, '..', 'data');
 
+/* 数据集配置（与 src/main.js 的 DATASETS 对应；Node 工具无 location，自行传名） */
+export const DATASET_FILES = {
+  flywire: {
+    connectome: 'connectome.bin.gz', pools: 'pools.json', keys: FLYWIRE_KEYS,
+    targetInput: 3.0, extraGroups: { mechJo: 11, driveHunger: 37 },
+  },
+  malecns: {
+    connectome: 'connectome-malecns.bin.gz', pools: 'pools_malecns.json', keys: MALECNS_KEYS,
+    targetInput: 4.0, extraGroups: { mechJo: null, driveHunger: 21 },
+    cfgDefaults: { olfGain: 2.0, gusIntensity: 1.6, standbyRate: 3 },  // 见 src/main.js DATASETS
+  },
+};
+
 /* 加载连接组与池（一次进程一次，扫参时反复复用同一 sim，episode 间 sim.reset()） */
-export async function loadWorld() {
-  const gz = readFileSync(join(DATA_DIR, 'connectome.bin.gz'));
+export async function loadWorld(dataset = 'flywire') {
+  const ds = DATASET_FILES[dataset] || DATASET_FILES.flywire;
+  const gz = readFileSync(join(DATA_DIR, ds.connectome));
   const gunzip = async (b) => {
     const o = gunzipSync(Buffer.from(b));
     return o.buffer.slice(o.byteOffset, o.byteOffset + o.byteLength);
   };
   const sim = await LIFSim.fromBuffer(
-    gz.buffer.slice(gz.byteOffset, gz.byteOffset + gz.byteLength), { gunzip });
+    gz.buffer.slice(gz.byteOffset, gz.byteOffset + gz.byteLength),
+    { gunzip, targetInput: ds.targetInput });
   const pools = Pools.fromJSON(
-    JSON.parse(readFileSync(join(DATA_DIR, 'pools.json'), 'utf-8')), sim.N);
+    JSON.parse(readFileSync(join(DATA_DIR, ds.pools), 'utf-8')), sim.N, ds.keys);
   const selectByGroup = (gid) => {
+    if (gid === null || gid === undefined) return null;
     const out = [];
     for (let i = 0; i < sim.N; i++) if (sim.groupId[i] === gid) out.push(i);
     return Uint32Array.from(out);
   };
-  const extra = { mechJo: selectByGroup(11), driveHunger: selectByGroup(37) };
-  return { sim, pools, extra };
+  const extra = {
+    mechJo: selectByGroup(ds.extraGroups.mechJo),
+    driveHunger: selectByGroup(ds.extraGroups.driveHunger),
+  };
+  return { sim, pools, extra, dataset, cfgDefaults: ds.cfgDefaults || null };
 }
 
 /* 线性同余发生器（可注入种子，替换 Math.random 用） */
@@ -55,11 +74,13 @@ export function replaceRandom(rng) {
  *   firstTortuosity = 首次吃到前的爬行路程 / 初始距离（≈1 为直线冲刺，越大越"真实漫游"）
  */
 export function runEpisode({ sim, pools, extra, seconds = 120, cfgOverride = null,
-                             seed = null, tickHz = 10, onEat = null, onLog = null }) {
-  const restore = (seed !== null && seed !== undefined) ? replaceRandom(makeLCG(seed)) : null;
+                             cfgDefaults = null, seed = null, tickHz = 10, onEat = null, onLog = null }) {
+  const restore = (seed !== null && seed !== undefined && !Number.isNaN(seed))
+    ? replaceRandom(makeLCG(seed)) : null;
   try {
     sim.reset();
     const game = new Game(pools, extra);
+    if (cfgDefaults) Object.assign(game.cfg, cfgDefaults);   // 数据集级默认（可被 cfgOverride 覆盖）
     if (cfgOverride) Object.assign(game.cfg, cfgOverride);
     game.placeBanana();
     const initialDist = Math.hypot(game.banana.x - game.fly.x, game.banana.y - game.fly.y);

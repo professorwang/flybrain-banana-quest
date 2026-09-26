@@ -1,5 +1,33 @@
 # 第三方声明（Third-Party Notices）
 
+## 0. MaleCNS 连接组数据（CC BY 4.0）与 fly-brain-minecraft（MIT License）
+
+`?dataset=malecns` 使用的 `game/data/connectome-malecns.bin.gz` 等三件套，
+由 `game/tools/flyb_to_bin.py` 从 [blendi-remade/fly-brain-minecraft](https://github.com/blendi-remade/fly-brain-minecraft)
+（MIT License）分发的 `malecns-v1.0.flyb.gz` 转换而来（FLYB v1 格式规范见其
+PROVENANCE.md 第 4 节）。
+
+底层数据为 neuPrint **male-cns:v1.0**，以 **Creative Commons Attribution 4.0
+International (CC BY 4.0)** 发布（https://creativecommons.org/licenses/by/4.0/）。
+按上游 PROVENANCE.md 第 7 节的署名文字：
+
+> Derived from the male CNS connectome, neuPrint dataset male-cns:v1.0, by the
+> FlyEM Project Team (HHMI Janelia Research Campus), the Drosophila Connectomics
+> Group (University of Cambridge / MRC LMB) and Google Research; licensed CC BY 4.0.
+> Modified: connections thresholded at >= 5 synapses, autapses removed, neurons
+> re-indexed, neurotransmitter signs assigned, photoreceptors assigned to medulla
+> columns.
+
+建议引用：
+
+- Berg S, Beckett IR, Costa M, Schlegel P, Januszewski M, et al. Sexual dimorphism
+  in the complete Drosophila male central nervous system connectome. *Cell*
+  189(18): 5504–5526.e15 (2026). https://doi.org/10.1016/j.cell.2026.08.015
+- 项目页：https://male-cns.janelia.org/ ；neuPrint：https://neuprint.janelia.org/
+
+本项目对数据的进一步修改：按 FLYB 规范解码后以 sim-core 格式重写二进制、
+按自定义规则划分 26 个功能组与游戏接口池（`game/tools/flyb_to_bin.py` 有完整记录）。
+
 ## 1. snedea/flybrain（MIT License）
 
 本项目的数据二进制封装格式、LIF 仿真算法与 Web Worker 架构参考并改编自社区项目

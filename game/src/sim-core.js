@@ -71,6 +71,9 @@ export class LIFSim {
     }
     const sim = new LIFSim();
     sim.normalization = opts.normalization || DEFAULTS.normalization;
+    // per-neuron 归一化目标可实例级覆盖（MaleCNS 需要 4.0 才能驱动下行神经元，
+    // 见 docs/malecns-probes.md）；不传则用 DEFAULTS.targetInput
+    sim.targetInput = opts.targetInput !== undefined ? opts.targetInput : DEFAULTS.targetInput;
     sim._parse(raw);
     sim._buildGroupStructures();
     return sim;
@@ -119,7 +122,7 @@ export class LIFSim {
         const w = this.values[e];
         sumIn[this.colIdx[e]] += w < 0 ? -w : w;
       }
-      const ti = DEFAULTS.targetInput;
+      const ti = this.targetInput;
       for (let e = 0; e < E; e++) {
         const s = sumIn[this.colIdx[e]];
         this.values[e] = s > 0 ? (this.values[e] / s) * ti : 0;

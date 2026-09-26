@@ -325,7 +325,7 @@ def main() -> None:
         r"|Sternotrochanter|Pleural", re.I)
     leg = [i for i in range(N) if sup_s[i] == "vnc_motor" and leg_re.search(type_s[i] or "")]
     register("leg_motor_left", [i for i in leg if side_s[i] == "L"],
-             "superclass==vnc_motor & type~/tibia|femur|trochanter|tarsus|ltm|coxa|Sternotrochanter|Pleural/i & side==L")
+             "superclass==vnc_motor & type~/tibia|femur|trochanter|tarsus|ltm|\\bTi\\b|\\bTr\\b|\\bFe\\b|\\bTa\\b|coxa|Sternotrochanter|Pleural/i & side==L")
     register("leg_motor_right", [i for i in leg if side_s[i] == "R"],
              "同上 & side==R")
 
@@ -351,4 +351,10 @@ def main() -> None:
     pools_path = OUT / "pools_malecns.json"
     with open(pools_path, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
-    print(f"写出 {pools_path} ({pools_path.stat().st_size / 1024:.0f} 
+    print(f"写出 {pools_path} ({pools_path.stat().st_size / 1024:.0f} KB)", file=sys.stderr)
+    for name, m in pmeta.items():
+        print(f"  {name}: {m['pool_size']}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

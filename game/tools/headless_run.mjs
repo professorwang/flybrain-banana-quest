@@ -1,8 +1,8 @@
 /* headless_run.mjs —— 无头闭环验证：不依赖浏览器，直接驱动
  * LIFSim + Game 跑完整"嗅觉→脑→转向→进食"循环。
  *
- * 运行：node game/tools/headless_run.mjs [秒数=120] [配置覆盖JSON] [种子]
- *   例：node game/tools/headless_run.mjs 180 '{"turnGain":4,"smellSigma":250}' 42
+ * 运行：node game/tools/headless_run.mjs [秒数=120] [配置覆盖JSON] [种子] [数据集=flywire]
+ *   例：node game/tools/headless_run.mjs 180 '{"turnGain":4}' 42 malecns
  * 无参数时行为与最初版本完全一致（120s、默认配置、不固定种子）。
  * 用途：浏览器端无法自动化时，验证游戏闭环在真实连接组上确实能吃到香蕉。
  */
@@ -14,17 +14,18 @@ if (process.argv[3]) {
   try { cfgOverride = JSON.parse(process.argv[3]); }
   catch (e) { console.error('配置覆盖 JSON 解析失败：', e.message); process.exit(2); }
 }
-const SEED = process.argv[4] !== undefined ? Number(process.argv[4]) : null;
+const SEED = (process.argv[4] && process.argv[4] !== 'null') ? Number(process.argv[4]) : null;
+const DATASET = process.argv[5] || 'flywire';   // 可选第 5 参数：malecns
 const TICK_HZ = 10;
 
-const { sim, pools, extra } = await loadWorld();
+const { sim, pools, extra, cfgDefaults } = await loadWorld(DATASET);
 
-console.log(`无头闭环：${SECONDS}s（脑 ${TICK_HZ}Hz + 游戏 60fps）`
+console.log(`无头闭环：${SECONDS}s（脑 ${TICK_HZ}Hz + 游戏 60fps，数据集 ${DATASET}）`
   + (cfgOverride ? `，配置覆盖 ${JSON.stringify(cfgOverride)}` : '')
   + (SEED !== null ? `，种子 ${SEED}` : ''));
 
 const result = runEpisode({
-  sim, pools, extra, seconds: SECONDS, cfgOverride, seed: SEED, tickHz: TICK_HZ,
+  sim, pools, extra, seconds: SECONDS, cfgOverride, cfgDefaults, seed: SEED, tickHz: TICK_HZ,
   onEat: (t, score) => console.log(`  [t=${t.toFixed(1)}s] 吃到香蕉！得分 ${score}`),
   onLog: (t, game, r) => {
     const d = game.banana

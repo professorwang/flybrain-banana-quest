@@ -36,6 +36,30 @@ node game/test/sim.test.mjs        # 退出码 0 为通过
 node game/tools/headless_run.mjs 120
 ```
 
+## 数据集切换（MaleCNS）
+
+默认数据集为 FlyWire FAFB v783（雌蝇全脑）。访问
+`http://localhost:8000/?dataset=malecns` 切换到 **MaleCNS v1.0**（雄蝇全中枢
+神经系统，176,422 神经元 / 6,287,749 条 ≥5 突触连接，**含腹神经索 VNC**——
+这次 motor 区有真实的腿/翅运动神经元），HUD 标题会注明当前数据集与神经元数。
+
+![MaleCNS 模式实拍：172,320 / 176,422 神经元激活，含 VNC 的雄蝇全 CNS](docs/img/malecns-mode.png)
+
+```bash
+# 数据转换（vendor/fly-brain-minecraft 的 FLYB v1 → 本项目三件套，纯标准库）
+python game/tools/flyb_to_bin.py
+# MaleCNS 跨数据集探针（TECH-NOTE 三发现复测，结果见 docs/malecns-probes.md）
+node game/tools/probe_malecns.mjs
+# MaleCNS 无头闭环（困难模式：嗅觉→下行神经元驱动弱，近距离才活跃）
+node game/tools/headless_run.mjs 120 null null malecns
+```
+
+MaleCNS 版的不同（全部实测，详见 [docs/malecns-probes.md](docs/malecns-probes.md)）：
+池用**原生注释**（somaSide/superclass/type）而非坐标近似；归一化工作点
+`targetInput=4.0`（ti=3 时下行神经元近乎静默）；游戏层默认覆盖
+`{olfGain:2.0, gusIntensity:1.6, standbyRate:3}`（困难模式参数，非读出注水）；
+逃逸读出为巨型纤维 DNp01 池（实测其不被刚毛刺激驱动，逃离判定仍以 desc 飙升为主）。
+
 ## 玩法
 
 - 果蝇闻到香蕉气味（强度 ∝ 1/(1+距离)，按朝向分左右触角池）→ 电流注入
@@ -57,7 +81,10 @@ game/
 ├── data/
 │   ├── connectome.bin.gz   FlyWire 连接组二进制（12.4 MB，snedea/flybrain 封装）
 │   ├── neuron_meta.json    63 个功能组定义
-│   └── pools.json          脑-游戏接口神经元池（tools/prepare_pools.py 生成）
+│   ├── pools.json          脑-游戏接口神经元池（tools/prepare_pools.py 生成）
+│   ├── connectome-malecns.bin.gz  MaleCNS v1.0 二进制（26 MB，tools/flyb_to_bin.py 转换）
+│   ├── neuron_meta_malecns.json   MaleCNS 26 个功能组定义
+│   └── pools_malecns.json         MaleCNS 池（原生 somaSide/superclass/type 筛选）
 ├── src/
 │   ├── sim-core.js         LIF 内核：解压/解析/CSR/组重排/tick（浏览器与 Node 共用）
 │   ├── sim-worker.js       Worker 薄壳（init/start/stop/setInput/stimulate/setParams/reset）
@@ -69,16 +96,20 @@ game/
 │   └── main.js             组装与主循环（游戏时钟与脑 tick 解耦）
 ├── tools/
 │   ├── prepare_pools.py    从 vendor 数据生成 pools.json（纯标准库）
+│   ├── flyb_to_bin.py      MaleCNS FLYB v1 → 本项目三件套（纯标准库）
+│   ├── probe_malecns.mjs   MaleCNS 跨数据集探针（TECH-NOTE 三发现复测）
 │   ├── harness.mjs         无头闭环共享库（loadWorld / runEpisode / LCG 种子）
 │   ├── headless_run.mjs    无头闭环验证（可选配置覆盖 JSON 与种子参数）
 │   └── tune_sweep.mjs      游戏层参数网格扫参
 ├── docs/
-│   └── TECH-NOTE.md        英文技术报告：归一化失败、结构偏置与调参教训
+│   ├── TECH-NOTE.md        英文技术报告：归一化失败、结构偏置与调参教训
+│   └── malecns-probes.md   MaleCNS 复测数据（技术报告 v2 素材）
 └── test/sim.test.mjs       Node 烟雾测试
 ```
 
 实测发现（归一化、结构偏置、种子过拟合）的完整英文技术报告见
-[docs/TECH-NOTE.md](docs/TECH-NOTE.md)。
+[docs/TECH-NOTE.md](docs/TECH-NOTE.md)；MaleCNS 跨数据集复测见
+[docs/malecns-probes.md](docs/malecns-probes.md)。
 
 ## 科学说明（诚实清单）
 

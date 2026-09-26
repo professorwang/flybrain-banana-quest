@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1>电子果蝇·香蕉大作战</h1>
-  <p class="tagline">139,255 个真实连接组神经元（FlyWire FAFB v783）正在驱动这只果蝇 ·
+  <p class="tagline" id="tagline">139,255 个真实连接组神经元（FlyWire FAFB v783）正在驱动这只果蝇 ·
     Eon 的闭环没开源，我们做一个浏览器里能跑的开源版</p>
 </header>
 
@@ -34,7 +34,7 @@
     </section>
 
     <section class="block">
-      <h2>脑活动 <small>63 功能组 · 蓝=感觉 紫=中枢 橙=驱动 绿=运动</small></h2>
+      <h2>脑活动 <small id="brain-groups-label">功能组 · 蓝=感觉 紫=中枢 橙=驱动 绿=运动</small></h2>
       <canvas id="bar-canvas" class="brain"></canvas>
       <canvas id="raster-canvas" class="brain"></canvas>
     </section>
@@ -72,15 +72,19 @@
     <details id="honesty" class="block" open>
       <summary><h2>科学诚实声明（必读）</h2></summary>
       <ul>
-        <li><b>真实：</b>连接组拓扑来自 <b>FlyWire FAFB v783</b>（139,255 神经元、
-          2,698,236 条聚合连接，含递质符号），行为由这份真实拓扑上的脉冲传播驱动。</li>
+        <li><b>真实：</b>连接组拓扑来自真实数据集（默认 <b>FlyWire FAFB v783</b>，
+          139,255 神经元 / 2,698,236 条聚合连接；<code>?dataset=malecns</code> 时为
+          <b>MaleCNS v1.0</b> 雄性全中枢，176,422 神经元 / 6,287,749 条 ≥5 突触连接，
+          含 VNC），行为由真实拓扑上的脉冲传播驱动。</li>
         <li><b>近似：</b>LIF 动力学与权重归一化是简化模型。默认按突触后神经元总输入
-          归一化（Shiu et al. 2024 思路）；不是电导模型，无突触延迟与神经调质。</li>
+          归一化（Shiu et al. 2024 思路）；不是电导模型，无突触延迟与神经调质。
+          归一化工作点因数据集而异（FlyWire 3.0 / MaleCNS 4.0，见 docs/malecns-probes.md）。</li>
         <li><b>人工选取：</b>感觉映射（气味→触角 ORN 池左右拆分）与运动读出池
-          （GNG_DESC 按胞体 x 坐标切半）是人工选取的，非解剖学精确；实测转向信号
-          微弱且带结构偏置，已做基线校正。</li>
+          是人工选取的，非解剖学精确（FlyWire 版按胞体 x 坐标切半，MaleCNS 版用原生
+          somaSide）；实测转向信号微弱（FlyWire 版还带结构偏置），已做基线校正。</li>
         <li><b>缺失：</b>FlyWire 不含腹神经索（VNC）。真实果蝇的行走由 VNC 主导，
-          本 demo 的"行走"只是下行神经元放电率的图形化映射。</li>
+          本 demo 的"行走"只是下行神经元放电率的图形化映射（MaleCNS 虽含 VNC，
+          本 demo 仍未模拟真实步态）。</li>
         <li><b>边界：</b>本 demo 不代表"意识上传"。一只会动的果蝇本身并不证明
           生物保真度（此表述参照 awesome-fly 的免责声明精神）。</li>
       </ul>
@@ -90,7 +94,9 @@
 
 <footer>
   <p>连接组数据：FlyWire FAFB v783（Dorkenwald et al., 2024, <i>Nature</i>；CC BY-NC-SA 4.0）·
-    二进制整理与仿真参考：<a href="https://github.com/snedea/flybrain">snedea/flybrain</a>（MIT）·
+    MaleCNS v1.0（Berg et al., 2026, <i>Cell</i>；CC BY 4.0）·
+    二进制整理与仿真参考：<a href="https://github.com/snedea/flybrain">snedea/flybrain</a>（MIT）与
+    <a href="https://github.com/blendi-remade/fly-brain-minecraft">fly-brain-minecraft</a>（MIT）·
     详见 <a href="THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.md</a></p>
 </footer>
 

@@ -63,7 +63,11 @@ self.onmessage = async (e) => {
   try {
     switch (d.type) {
       case 'init': {
-        sim = await LIFSim.fromBuffer(d.buffer);
+        // 可选 normalization/targetInput 覆盖（MaleCNS 数据集用 targetInput=4.0）
+        sim = await LIFSim.fromBuffer(d.buffer, {
+          normalization: d.normalization,
+          targetInput: d.targetInput,
+        });
         // 回传组排序后的组/区域数组副本（主线程选池、着色用），原数组留在 worker
         self.postMessage({
           type: 'ready',
@@ -71,6 +75,7 @@ self.onmessage = async (e) => {
           edgeCount: sim.edgeCount,
           numGroups: sim.numGroups,
           normalization: sim.normalization,
+          targetInput: sim.targetInput,
           groupId: sim.groupId.slice(),
           regionType: sim.regionType.slice(),
         });
