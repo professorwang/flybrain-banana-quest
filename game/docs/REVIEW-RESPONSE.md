@@ -327,3 +327,82 @@ game/README.md 调参记录"。
   （v4.1 页脚/标题、去硬编码 hash、版式压缩）
 - `game/docs/results/`（probe_supplementary.txt、reproduce_sweeps.txt 新增）
 - `game/docs/arxiv/`（LaTeX 投稿源：main.tex + README.md）
+
+---
+
+# 第四轮（v4.1 → v5）：核心论证通过后的交付修订与结构重构
+
+> 复审结论：核心论证通过。剩 4 个交付问题 + 1 个结构建议。复审原话（结构建议）：
+> "把反复更正的过程移到答复信或附录，让正文围绕一个问题展开：数据加工选择如何
+> 改变连接组仿真的结论。"以下逐条答复。
+
+## U1 LaTeX 字体（投稿兼容性）
+
+**意见**：main.tex 按名称加载 Noto Sans CJK SC，arXiv 要求按文件名加载且其清单无此字体。
+
+**处理**：改用 TeX Live 自带 Fandol 系列并按文件名加载：
+`\setCJKmainfont{FandolSong-Regular.otf}[BoldFont={FandolHei-Regular.otf}, ItalicFont={FandolKai-Regular.otf}]`
++ `\setCJKsansfont{FandolHei-Regular.otf}`；§7 复现表加 `\footnotesize` +
+`sloppypar` 防长命令串溢出；arxiv/README 写明 arXiv 用 XeLaTeX + Fandol、Overleaf
+备选方案与自检命令的正确路径（`python game/docs/arxiv/check_tex.py`，仓库根目录）。
+本机 MiKTeX 安装中，编译验收由主代理执行（遗留项）。
+
+## U2 R7 冠军样本外入口
+
+**意见**：reproduce_sweeps.mjs 缺冠军配置的样本外复跑。
+
+**处理**：补第 5 个配置（turnGain=1.8、种子 101–110、bananaMaxDist=null），实跑结果
+**8/10、中位 57.7s、均值 73.7s、得分 1.30**——与正文 §4.1 数字逐项一致，存档
+`docs/results/reproduce_sweeps.txt` 已更新。
+
+## U3 许可统一（认错：此前 CC BY-NC-SA 为推定错误）
+
+**意见**：FlyWire 官方 guidelines 现行文本为 CC BY-NC 4.0（无 SA）。
+
+**核实**：属实。全局更正为 **CC BY-NC 4.0**：`.zenodo.json`（顶层 license 保留 MIT，
+description 第一句明确 "MIT applies to code only; FlyWire data CC BY-NC 4.0,
+MaleCNS data CC BY 4.0"，notes 同步）、`CITATION.cff`、`game/THIRD_PARTY_NOTICES.md`
+（保留一处沿革说明）、`game/README.md`、`game/index.html`、
+`game/tools/fetch_vendor_data.md`、`game/docs/TECH-NOTE.md`、
+`game/docs/arxiv/main.tex`、`docs/media/zhihu-article.md`。知识库文档
+（knowledge/04、06 与技能文件）历史表述"以官网为准"，本次未动，列后续维护项。
+
+## U4 残留归因
+
+**处理**：`game/THIRD_PARTY_NOTICES.md` 的 Shiu 条目改为与 v4.1 正文一致
+（官方代码 w_syn=0.275·mV 全局系数；postsynaptic L1 为本项目采用，两者不同，早期
+误引已更正）；arxiv/README 自检命令路径修正（见 U1）。
+
+## U5 结构重构（复审核心建议，v5 重头）
+
+**执行**：TECH-NOTE.md 与 main.tex 同步重构为单一主线——
+**两个社区数据包的加工差异（赋号规则）→ 双向符号干预（充分+必要）→ 面向
+"在连接组上跑动力学"社区的方法论建议**：
+- 三个原始发现压缩为 §1.1 先驱发现 P1/P2/P3（各保留核心数字与教训，流水账删除）；
+- v2→v4.1 更正沿革全部移出正文，集中到附录 A "Correction history"（简述）与本
+  答复信（详录）；
+- 新增 §4 先例对照：fly-brain-minecraft 的 docs/VALIDATION.md（静默脑检查、
+  sugar→MN9 进食链、增益扫描 0.65/0.75 失控、嗅觉 PN 饱和与"无明确转向信号"
+  的如实限制）与 flybench（预注册任务、重连对照），逐条说明本文新增——双向
+  符号干预的因果设计、跨数据包审计方法（重建等价性自检）、全命令冻结的公开管线；
+  并指出与上游记录的收敛点（嗅觉→DN 转向弱、增益悬崖、逐数据集校准）本身即证据；
+- "充分且必要"结论后新增边界声明：这是**模型内赋号干预的因果结果**，不能据此
+  推导真实果蝇的谷氨酸机制；生物机制论文需要生理/行为证据；
+- 中英文摘要同步聚焦主线。
+
+**对学术/商业评估边界的回应要点**：接受技术报告定位（不宣称生物保真度、不宣称
+"上传"）；接受"充分且必要"仅为模型内因果声明（见上边界声明）；许可按官方文本
+更正后，代码 MIT / FlyWire CC BY-NC 4.0（非商业）/ MaleCNS CC BY 4.0 三分权属
+在 .zenodo.json、CITATION.cff、THIRD_PARTY_NOTICES 与各 README 一致。
+
+## 附：v5 全部改动文件
+
+- `game/docs/TECH-NOTE.md`（v5 结构重构）；`game/docs/arxiv/main.tex`（同步重构
+  + Fandol）；`game/docs/arxiv/README.md`（编译说明与自检路径）
+- `game/docs/REVIEW-RESPONSE.md`（本信追加第四轮）
+- `game/tools/reproduce_sweeps.mjs`（+冠军样本外配置）、
+  `game/docs/results/reproduce_sweeps.txt`（重跑存档）
+- 许可：`/.zenodo.json`、`/CITATION.cff`、`game/THIRD_PARTY_NOTICES.md`、
+  `game/README.md`、`game/index.html`、`game/tools/fetch_vendor_data.md`、
+  `docs/media/zhihu-article.md`
+- `game/docs/TECH-NOTE.pdf`（v5 重出）

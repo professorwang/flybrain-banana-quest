@@ -1,13 +1,15 @@
 % !TEX program = xelatex
 % ======================================================================
-% Banana Quest technical note v4.1 — arXiv submission source
-% 编译：含中文摘要，需 XeLaTeX（xeCJK + Noto Sans CJK SC，Overleaf 内置）。
-% 若只能用 pdfLaTeX：注释掉 \usepackage{xeCJK}、\setCJKmainfont 两行，
-% 并将"中文摘要"环境整段删除（见下方标记 %<PDFFRIENDLY-START/END>）。
+% Banana Quest technical note v5 — arXiv submission source
+% 编译：含中文摘要，需 XeLaTeX（xeCJK）。字体用 TeX Live 自带的 Fandol
+% 系列（按文件名加载，arXiv 兼容），不要用本机字体名。
+% 若只能用 pdfLaTeX：注释掉 \usepackage{xeCJK} 与两条 \setCJK*font，
+% 并删除 %<PDFFRIENDLY-START/END> 之间的中文摘要段。
 % ======================================================================
 \documentclass[11pt,a4paper]{article}
 \usepackage{xeCJK}
-\setCJKmainfont{Noto Sans CJK SC}
+\setCJKmainfont{FandolSong-Regular.otf}[BoldFont={FandolHei-Regular.otf}, ItalicFont={FandolKai-Regular.otf}]
+\setCJKsansfont{FandolHei-Regular.otf}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
@@ -19,364 +21,161 @@
 \newcommand{\ds}[1]{\textcolor{linkblue}{\url{#1}}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
-\title{Dynamics on aggregated connectomes in the browser:\\
-normalization, structural bias, and honest tuning lessons\\
-across two connectomes}
+\title{Packaging choices change connectome-simulation outcomes:\\
+sign tables, a bidirectional intervention, and honest lessons\\
+from two connectomes}
 \author{Banana Quest project (\texttt{fruitfly/game/})}
-\date{Technical note v4.1, 2026-09-27}
+\date{Technical note v5, 2026-09-27}
 
 \begin{document}
 \maketitle
 
+\begin{sloppypar}
 \noindent\small
-\textbf{Technical note v4.1, 2026-09-27.} Code: \texttt{fruitfly/game/} --- v1
-measurements @ commit \texttt{d92807b}, v2 probes @ \texttt{73da541}, v3--v4
-scripts \& experiments @ \texttt{63c54ca} / \texttt{709b188}, this revision @
-\texttt{80a4768} (MIT). Data: FlyWire FAFB v783 (CC BY-NC-SA 4.0) and
-MaleCNS v1.0 (CC BY 4.0). v4.1 closes the third review round (``minor
-revisions, no new experiments required''): histamine-account correction,
-reverse-experiment precision, two final frozen reproduction entries, and
-editorial cleanup. Point-by-point responses: \texttt{docs/REVIEW-RESPONSE.md}.
+\textbf{Technical note v5, 2026-09-27.} Code: \texttt{fruitfly/game/} ---
+commit lineage in \S7, this revision @ \texttt{\_\_COMMIT\_\_} (MIT). Data:
+FlyWire FAFB v783 (CC BY-NC 4.0) and MaleCNS v1.0 (CC BY 4.0). v5 restructures
+the note around one mainline question --- how do data-packaging choices change
+the conclusions of ``run dynamics on a connectome'' simulations? Earlier
+finding-level detail is compressed; the full correction chronology moved to
+Appendix A and the review-response letter (\texttt{docs/REVIEW-RESPONSE.md}).
 Repository: \ds{https://github.com/professorwang/flybrain-banana-quest};
 demo: \ds{https://professorwang.github.io/flybrain-banana-quest/}.
 \normalsize
+\end{sloppypar}
 
 %<PDFFRIENDLY-START> —— pdfLaTeX 备选：删除本段中文摘要即可
 \section*{中文摘要}
-本文记录浏览器游戏《电子果蝇·香蕉大作战》（Banana Quest）在真实连接组上跑动力学时实测到的方法学问题及其跨数据集复测结果，供连接组仿真社区参考。游戏用 LIF 脉冲网络在两个真实连接组（FlyWire FAFB v783：139,255 神经元 / 2,698,236 条聚合连接；MaleCNS v1.0：176,422 神经元 / 6,287,749 条 $\ge$5 突触连接）上驱动一只 2D 果蝇觅食——连接组放电参与运动读出与进食门控，同时游戏包含显式运动规则（\S1.1 如实列出）。发现一：参考实现沿用的全局 max 权重归一化（增益 0.15）在\textbf{参考增益下}传播失败——重尾突触计数分布把典型权重压到阈值的约 1/2000，下游膜电压在 100 ticks 内观察到的最大值仍不过阈（FlyWire 0.780、MaleCNS 0.977），中枢放电为零；增益放大 10 倍后两数据集分别有 16 / 131 次中枢放电，因此结论收窄为“参考增益下失败”而非“必然失败”。可行替代是本项目采用的 postsynaptic L1 归一化（每个突触后神经元总入权重归一化为常数；与 Shiu et al.\ 2024 的每突触固定系数方案不同），工作点为数据集相关（FlyWire 3.0 / MaleCNS 4.0）。发现二：FlyWire 下行池按胞体 x 切半后存在结构性偏置（任一侧刺激右池都更活跃，有效差仅约 1.3\%），转向读出采用本项目选用的启发式高通读出（慢速 EMA 基线的偏差）；该偏置在所测 MaleCNS 条件下未复现（侧向对比方向正确，差 9.49 个百分点，算式 $91/157 - 111/229 \approx 0.09490$），“分组伪影”解释目前仅为待验证假说。发现三（方法论）：小种子扫参会过拟合——实测冠军配置在 10 个样本外种子上未保持优势（首吃时间只统计成功 episode）。符号实验闭环：仅把 MaleCNS 的谷氨酸符号从抑制翻为兴奋，ti=4 时视叶出现高活动（VIS\_OL 553,863 次放电）；反向把 FlyWire 的谷氨酸翻为抑制，ti=4 视叶高活动消失（VIS\_ME 405,788 $\to$ 0）——在 ti=4、I=1、200 tick 及所比较的 GLUT 正/负两种配置下，谷氨酸符号赋值既是高视叶活动表型的充分条件也是必要条件（ti=3 结果照实报告但不纳入该结论范围）；两数据包符号表不同（GLUT 兴奋 vs 抑制；MaleCNS 明确将 8,021 个 histamine 标记节点设为抑制，而 FlyWire 的六类递质预测不含 histamine——不能从缺少该预测类别直接推断真实组胺能神经元在 FlyWire 包中的赋号），是跨数据包动力学比较必须显式声明的混杂。所有数字均可由文中命令复现（注明历史记录者除外）。
+本文回答一个方法论问题：\textbf{数据加工选择如何改变连接组仿真的结论}。我们用同一个 LIF 内核、同一组探针，在两个社区封装的真实连接组（FlyWire FAFB v783：139,255 神经元；MaleCNS v1.0：176,422 神经元）上测量。起点是三个加工事实：两个包都做了 $\ge$5 突触过滤；FlyWire 包把谷氨酸赋为兴奋性而 MaleCNS 包赋为抑制性（histamine 仅 MaleCNS 包显式标记 8,021 个节点为抑制，FlyWire 的六类递质预测不含该类别）；参考实现的全局 max 归一化在参考增益下两包都不传播（100 tick 观察到的最大电压 0.780/0.977 不过阈、中枢零放电）。核心实验是\textbf{双向符号干预}：MaleCNS 的谷氨酸翻为兴奋（其余不变）$\to$ ti=4 视叶高活动（VIS\_OL 553,863 次放电）；FlyWire 的谷氨酸翻为抑制 $\to$ ti=4 视叶高活动消失（VIS\_ME 405,788 $\to$ 0）。在 ti=4、I=1、200 tick 及所比较的 GLUT 正/负两种配置下，谷氨酸符号赋值对该高活动表型既充分又必要——这是\textbf{模型内赋号干预的因果结果，不能据此推导真实果蝇的谷氨酸机制}。方法论建议（面向“在连接组上跑动力学”的社区）：逐数据集做传播测试并同时公布工作点与符号表；读出池对慢基线校准并披露偏置（我们的 FlyWire 下行池偏置约 24\%，有效差仅 1.3\%）；高方差行为指标必须样本外复核（5 种子冠军在 10 个样本外种子上中位 26.4s $\to$ 57.7s 现形）；如实列出游戏层显式规则。先例对照（fly-brain-minecraft 的 VALIDATION.md 增益扫描与嗅觉读出失败记录、flybench 的预注册任务与重连对照）之外，本文的新增是：双向符号干预的因果设计、跨数据包审计方法、全部命令可复现的公开管线。
 %<PDFFRIENDLY-END>
 
 \begin{abstract}
-\noindent Banana Quest is a zero-dependency browser game in which a leaky
-integrate-and-fire (LIF) network running on a real connectome helps drive a 2D
-foraging fly. Connectome activity participates in the motor readout and
-feeding gating; the game additionally contains explicit motor rules, which we
-list openly (\S1.1). We report three methodological findings and their
-cross-dataset replication on FlyWire FAFB v783 and MaleCNS v1.0. (1)
-Global-max weight normalization \textbf{at the reference gain (0.15)} fails to
-propagate activity on aggregated connectomes with heavy-tailed synapse-count
-distributions --- the maximum membrane voltages observed within 100 ticks stay
-below threshold (0.780 / 0.977), with zero central spikes on both datasets; at
-$10\times$ gain a small number of central spikes appears (16 / 131), with
-unknown stability, so we scope the claim to the reference gain rather than
-``global-max never propagates''. A working alternative is postsynaptic L1
-normalization (adopted in this project; distinct from Shiu et al.'s fixed
-per-synapse coefficient scheme), with a dataset-dependent working point (3.0 /
-4.0). (2) A coarse bilateral descending readout on FlyWire carried a
-structural bias larger than the stimulus-driven signal ($\sim$1.3\%); it did
-not replicate under the tested MaleCNS conditions (correctly signed contrast,
-9.49 percentage points, $91/157 - 111/229 \approx 0.09490$), so the
-``pool-definition artifact'' explanation remains a hypothesis --- the decisive
-test is re-pooling on the same dataset. (3) Small-seed sweeps of high-variance
-behavioral metrics can overfit: concretely, our 5-seed champion configuration
-did not retain its advantage on 10 out-of-sample seeds (first-eat statistics
-count successful episodes only). Sign experiments now close both directions:
-flipping only the glutamate sign from inhibitory to excitatory in MaleCNS
-produces high visual-lobe activity at ti=4 (553,863 VIS\_OL spikes), and the
-reverse flip in FlyWire abolishes it (VIS\_ME 405,788 $\to$ 0) ---
-\textbf{at ti=4, I=1, 200 ticks, and across the two GLUT sign configurations
-compared}, the glutamate sign assignment is both sufficient and necessary for
-the high-activity phenotype (ti=3 results are reported but excluded from this
-conclusion). The two packages also differ in their sign tables: GLUT
-excitatory vs inhibitory, and MaleCNS explicitly marks 8,021 histamine-labeled
-nodes inhibitory while FlyWire's six-class transmitter prediction contains no
-histamine class at all --- the absence of a predicted class cannot be used to
-infer how real histaminergic neurons are signed in the FlyWire package. These
-are confounds any cross-package dynamical comparison must declare. All numbers
-are reproducible with the commands given, except where marked as historical
-records.
+\noindent \textbf{Question: how do data-packaging choices change the
+conclusions of ``run dynamics on a connectome'' simulations?} We answer it
+with one simulation core and one frozen probe battery on two
+community-packaged real connectomes (FlyWire FAFB v783, 139,255 neurons;
+MaleCNS v1.0, 176,422 neurons). Three packaging facts set the stage: both
+packages filter connections at $\ge$5 synapses; the FlyWire package signs
+glutamate excitatory while the MaleCNS package signs it inhibitory (histamine
+is explicitly inhibitory for 8,021 labeled nodes only in MaleCNS --- FlyWire's
+six-class transmitter prediction has no histamine class at all); and the
+reference global-max normalization fails to propagate at the reference gain on
+both packages (100-tick observed maxima 0.780 / 0.977, zero central spikes).
+The core result is a \textbf{bidirectional sign intervention}: flipping only
+the glutamate sign in MaleCNS from inhibitory to excitatory produces high
+visual-lobe activity at ti=4 (553,863 VIS\_OL spikes), and the reverse flip in
+FlyWire abolishes it (VIS\_ME 405,788 $\to$ 0) --- at ti=4, I=1, 200 ticks,
+and across the two GLUT sign configurations compared, the glutamate sign
+assignment is both sufficient and necessary for the high-activity phenotype.
+\textbf{This is a causal result about sign perturbations inside the model; it
+licenses no inference about real fly glutamatergic biology, which would
+require physiological or behavioral evidence.} Methodological recommendations
+for the ``dynamics on connectomes'' community: run a per-dataset propagation
+test and publish the working point \emph{and} the sign table; calibrate
+readout pools against a slow baseline and disclose the bias (our FlyWire
+descending pools carried a $\sim$24\% structural bias against a $\sim$1.3\%
+stimulus contrast); validate high-variance behavioral metrics out-of-sample
+(our 5-seed champion's median degraded 26.4 s $\to$ 57.7 s on 10 fresh seeds);
+and disclose explicit game-layer motor rules. Relative to prior validation
+work (fly-brain-minecraft's VALIDATION.md gain sweeps and olfaction-readout
+failure records, flybench's pre-registered tasks with shuffled-wiring
+controls), this note adds a bidirectional causal intervention design, a
+cross-package audit method, and a fully reproducible public pipeline. All
+numbers are reproducible with the commands given, except where marked as
+historical records.
 \end{abstract}
 
-\section{Background}
+\section{Background and mainline question}
 
-Banana Quest (电子果蝇·香蕉大作战) is an open-source, zero-build browser game.
-A virtual fly forages for bananas in a 2D arena. Olfactory input is injected
-as current into left/right pools of olfactory receptor neurons; spikes
-propagate through the connectome to descending neurons, whose pooled
-left/right firing-rate difference steers the fly, and whose total rate, scaled
-by a hunger variable, sets its speed. Feeding is gated by gustatory
-stimulation driving a proboscis motor-neuron readout. \textbf{Connectome
-spiking participates in steering and in feeding gating --- but it is not the
-only thing moving the fly: the game also contains explicit motor rules,
-disclosed in \S1.1.}
-
-The FlyWire connectome ships as a compact binary (12.4 MB gzipped) packaged by
-the community project snedea/flybrain (MIT): FAFB v783 edges aggregated per
-neuron pair with signed weights, plus a coarse 63-group functional annotation.
-Their reference simulator runs the full network in a Web Worker at
-$\sim$10 ticks/s using a neuropil-gated dormant-group optimization; our
-simulation core (\texttt{src/sim-core.js}) is adapted from it and runs
-unchanged in both the browser worker and Node.js for testing. The second
-dataset is MaleCNS v1.0 (neuPrint \texttt{male-cns:v1.0}; 176,422 neurons,
-6,287,749 connections at $\ge$5 synapses; the full male central nervous system
-including the VNC; CC BY 4.0), selected at runtime with
-\texttt{?dataset=malecns}. We take the FLYB v1 binary bundled by the
-fly-brain-minecraft project (MIT) and convert it with our own
-\texttt{tools/flyb\_to\_bin.py} into the same sim-core format --- 26
-functional groups with the same region encoding, and pools filtered on
-MaleCNS's native annotations (somaSide, superclass, type). Every probe below
-runs through the identical \texttt{sim-core.js} on both datasets.
-
-\subsection{Explicit game-layer motor rules}
-
-Earlier versions of this note said ``no hand-crafted behavior layer'' --- that
-was overstated. The brain participates in behavior, but the following explicit
-rules also move or stop the fly, and reviewers rightly asked for them to be
-listed:
+Banana Quest (电子果蝇·香蕉大作战) is a zero-dependency browser game in which
+a leaky integrate-and-fire (LIF) network running on a real connectome helps
+drive a 2D foraging fly. The question this note is organized around is not
+``does the fly move'' but: \textbf{when a community takes a published
+connectome, packages it, and runs off-the-shelf dynamics on it, which
+conclusions are determined by the packaging choices rather than by the
+connectome itself?} Our testbed is two independent packages of two different
+connectomes, probed through the identical simulation core
+(\texttt{src/sim-core.js}, browser worker and Node.js alike):
 
 \begin{itemize}
-\item \textbf{Standby random walk}: when the descending pools' total firing
-rate falls below a threshold, the fly performs a slow random walk driven by
-game-layer noise, explicitly labeled ``待机噪声（非脑驱动）'' in the UI.
-\item \textbf{Approach deceleration and stopping}: speed is additionally
-scaled down when turning sharply and when close to the banana (a
-turn-and-slow kinematic rule), and the fly stops inside the eating radius
-while the feeding gate is evaluated.
-\item \textbf{Scripted escape maneuver}: after a startle, the escape
-\emph{trigger} is the brain's response (descending-rate surge or DNp01
-firing), but the escape \emph{maneuver} itself --- a random sharp turn plus a
-fixed-duration speed boost --- is scripted.
-\item \textbf{Wall bounce}: heading reflects off arena walls with added noise.
-\item \textbf{Hunger wiring}: hunger is a scripted clock that multiplies
-olfactory gain and injects current into a hunger-drive group (an acknowledged
-artificial wiring).
-\item \textbf{Sensor mapping and pool selection}: the odor$\to$current
-mapping, the left/right pool splits, and all readout pools are hand-designed
-(acknowledged throughout; MaleCNS stimulus pools are additionally asymmetric,
-\S5.5).
+\item \textbf{FlyWire FAFB v783} (139,255 neurons, 2,698,236 aggregated
+connections, brain-only, female), packaged by snedea/flybrain (MIT) as a
+12.4 MB binary with a 63-group annotation;
+\item \textbf{MaleCNS v1.0} (176,422 neurons, 6,287,749 connections at $\ge$5
+synapses, full male CNS with VNC), taken from fly-brain-minecraft's FLYB v1
+bundle (MIT) and converted by our \texttt{tools/flyb\_to\_bin.py} into the
+same format with 26 groups and native-annotation pools.
 \end{itemize}
 
-What the brain does do: it gates eating (the fly cannot eat unless the
-proboscis readout fires), it modulates steering and speed through the
-descending pools, and it decides whether a startle produces escape. What it
-does not do: fine motor coordination of walking, which is VNC-driven in real
-flies and kinematic rendering here.
+The game context matters only as motivation: connectome spiking participates
+in steering and feeding gating, \textbf{and} the game contains explicit motor
+rules (standby random walk, approach deceleration and stopping, scripted
+escape maneuver, wall bounce, scripted hunger wiring, hand-designed sensor
+mappings and pool selections) --- disclosed here once, because reviewers
+rightly objected to an earlier ``no hand-crafted behavior layer'' claim.
 
-\section{Finding 1 --- Global-max normalization at the reference gain does not propagate on aggregated connectomes}
+\subsection{Precursor findings (compressed; details in Appendix and archives)}
 
-\subsection{Measurement}
+Three problems motivated the mainline study; each retains its core numbers and
+its lesson here.
 
-The reference implementation normalizes edge weights globally:
-$w \leftarrow w / \max|w| \times 0.15$. On both aggregated datasets the raw
-synapse-count weights are extremely heavy-tailed:
+\textbf{P1 --- normalization decides whether anything propagates at all.} The
+reference implementation's global-max weight normalization (gain 0.15) leaves
+the heavy-tailed weight distribution (max 2405 / median 8) with a median
+effective weight $\sim$1/2000 of threshold. On both datasets, driving the left
+olfactory pool at 0.5 for 100 ticks produced activity confined to sensory
+groups with zero central spikes (FlyWire: 18,525 spikes all sensory, 100-tick
+observed max voltage 0.780; MaleCNS: 21,867, max 0.977). At $10\times$ gain a
+small number of central spikes appears (16 / 131) with unknown stability ---
+so the claim is scoped to the reference gain. The working alternative we
+adopted is \textbf{postsynaptic L1 normalization} (per-neuron total input
+scaled to \texttt{targetInput}; our engineering choice, distinct from Shiu et
+al.'s fixed per-synapse coefficient \texttt{w\_syn = 0.275 $\cdot$ mV}), whose
+layered reachability replicates on both datasets but whose \textbf{working
+point is dataset-dependent (3.0 FlyWire / 4.0 MaleCNS)}. Lesson: publish
+normalization, gain, and a propagation test; silence at reference gain is the
+default, not a stimulus bug.
 
-\begin{center}
-\begin{tabular}{lcccc}
-\toprule
-dataset & max & median & p90 & p99 \\
-\midrule
-FlyWire v783 & 2405 & 8 & 23 & 77--83 (sample-dependent) \\
-MaleCNS v1.0 & 2591 & 9 & 28 & 93 \\
-\bottomrule
-\end{tabular}
-\end{center}
+\textbf{P2 --- coarse bilateral readouts can carry structural bias.} Our
+FlyWire descending readout (GNG\_DESC split by soma-x median, 1,791/1,790)
+fires the right pool more under \emph{either} unilateral antennal stimulus
+(1,704 vs 2,106 left-stim; 1,633 vs 2,133 right-stim) --- a $\sim$24\% bias
+against a $\sim$1.3\% stimulus contrast. We steer on a \textbf{heuristic
+high-pass readout} (deviation from a $\tau = 5$ s EMA baseline), offered with
+no claim that it removes bias or recovers a ``true'' lateral signal. Lesson:
+calibrate readout pools against a slow baseline and report the bias.
 
-Global-max normalization therefore maps the \emph{median} edge to
-$\approx 0.15 \times 8/2405 \approx 5\times10^{-4}$ --- roughly 1/2000 of the
-firing threshold (1.0). Empirically, driving the left olfactory pool at
-sustained intensity 0.5 for 100 ticks produced, on \textbf{FlyWire}, 18,525
-spikes \textbf{all in sensory groups; central-brain spikes: 0}, with the
-downstream OLF\_PN group's maximum membrane voltage observed within those 100
-ticks reaching only \textbf{0.780} (0.688 within the first 50 ticks of the
-same run). On \textbf{MaleCNS} the same protocol produced 21,867 spikes, again
-all sensory, central and motor 0, with the 100-tick observed maximum at
-\textbf{0.977}. Signal dies in the antennal lobe at the reference gain on both
-datasets.
+\textbf{P3 --- small-seed sweeps overfit.} A 5-seed sweep crowned
+\texttt{turnGain} = 1.8 (median first-eat 26.4 s, score 3.00); on 10
+out-of-sample seeds it collapsed (8/10, median 57.7 s, score 1.30), worse
+than the status-quo default on the same seeds (10/10, 49.6 s, 2.70). What
+robustly helped was level design (banana spawn ring 150--250 px, median
+27.3 s), not readout retuning. Caveats we disclose: first-eat statistics
+count successful episodes only; the 101--110 seed set served both selection
+and evaluation; and the champion's 3.00 required the historical unbounded
+spawn distance (2.20 under today's default, 3.00 restored with
+\texttt{"bananaMaxDist":[null]} --- both verified against the reviewer's
+independent measurements). Lesson: validate high-variance behavioral metrics
+out-of-sample, and say which seeds did what.
 
-\subsection{Postsynaptic L1 normalization (adopted in this project)}
+\section{What the two packagings actually change}
 
-We replaced global scaling with \textbf{postsynaptic L1 normalization}: each
-postsynaptic neuron's total incoming $|w|$ is scaled to a constant
-\texttt{targetInput}. \emph{Attribution note: earlier versions of this note
-called this ``Shiu et al.\ (2024)-style'' --- a misattribution. Shiu et al.'s
-published code (\texttt{philshiu/Drosophila\_brain\_model}, \texttt{model.py})
-uses a fixed per-synapse coefficient (\texttt{w\_syn = 0.275 $\cdot$ mV}), not
-postsynaptic total-input normalization. The scheme adopted here is our own
-engineering choice for this project; the two differ fundamentally (per-neuron
-budget vs global coefficient).} Sweeping \texttt{targetInput} (200-tick probes
-driving the same ORN pool):
+\subsection{Both are $\ge$5-synapse filtered}
 
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-targetInput & FlyWire (200 ticks) & MaleCNS (200 ticks) \\
-\midrule
-1.0 & MB\_KC 2,544, GNG\_DESC 0 & MB\_KC 148, DN 0 \\
-2.0 & MB\_KC 57,446, GNG\_DESC 10 & MB\_KC 37,237, DN 0 \\
-3.0 & GNG\_DESC 3,810; stable over 500 ticks of maximal bilateral input & DN 11; no visual ignition \\
-4.0 & whole-brain ignition (VIS\_ME 405,788 spikes/200 ticks, zero visual input) & DN 75; VIS\_OL 2 (no ignition) \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The working point is dataset-dependent: we ship 3.0 for FlyWire and 4.0 for
-MaleCNS (\S5.3).
-
-\subsection{Gain dependence (review replication)}
-
-An external reviewer noted that the failure claim depends on the gain
-constant. Repeating the \S2.1 protocol with the global-max coefficient scaled
-$\times 10$ ($0.15 \to 1.5$): \textbf{a small number of central spikes appears
-on both datasets --- 16 on FlyWire, 131 on MaleCNS (plus 13 motor)}
-(\texttt{node game/tools/probe\_gain.mjs}; archive
-\texttt{docs/results/probe\_gain.txt}). We state this narrowly: at reference
-gain 0.15, propagation fails on both datasets; at $\times 10$, a small number
-of central spikes appears, and the stability or usefulness of the higher-gain
-regime is unknown (not characterized here). Accordingly, Finding 1 is scoped
-to the reference gain throughout.
-
-\subsection{Discussion}
-
-Aggregation is the culprit multiplier at the reference gain: collapsing all
-synaptic contacts between a neuron pair into one scalar produces a few huge
-weights (a 2405-contact edge) that set the global scale for everyone else, and
-a threshold model then divides the world into ``edges that matter'' and
-``edges that don't'' with nothing in between. Any demo that ``just runs
-dynamics'' on an aggregated connectome should publish its normalization, its
-gain, and a propagation test; a silent network at reference gain is the
-default outcome, not a bug in your stimulus.
-
-\section{Finding 2 --- Structural bias in coarse descending readouts (FlyWire measurement)}
-
-\subsection{Measurement}
-
-Our FlyWire steering readout splits GNG\_DESC (3,581 neurons) into left/right
-pools by soma x-coordinate median (1,791 / 1,790 neurons). Stimulating either
-antennal pool alone (I=1.0, 200 ticks, targetInput 3.0) gives:
-
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-stimulus & desc\_left & desc\_right & L/(L+R) \\
-\midrule
-left antenna pool & 1,704 & 2,106 & 0.447 \\
-right antenna pool & 1,633 & 2,133 & 0.434 \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The right pool fires more under \textbf{either} unilateral stimulus (bias
-$\approx +24\%$ over the left pool), while the stimulus-dependent contrast
-between the two rows is only $\sim$1.3\%. First descending spikes appear 9
-ticks ($\sim$0.9 s at 10 Hz) after stimulus onset. Feeding the raw rates into
-a steering law $\mathrm{turn} = k\cdot(R-L)/(R+L+\varepsilon)$ would make the
-fly veer right forever regardless of where the banana is.
-
-\subsection{Heuristic high-pass readout}
-
-We steer on a \textbf{heuristic high-pass readout adopted in this project}:
-$\mathrm{turn} = k\cdot(\hat{R}-\hat{L})/(\hat{R}+\hat{L}+\varepsilon)$ with
-$\hat{R} = \max(0, R - \mathrm{EMA}_\tau(R))$, $\tau = 5$ s. We make no claim
-that this removes the bias or recovers a ``true'' lateral signal; it is a
-heuristic chosen for responsiveness, and the only ablation we offer is
-behavioral: longer baselines ($\tau = 20$--$40$ s) perform worse in our sweeps
-(eat rates fall to 40--80\% in 7 of 8 swept configurations, and at $\tau = 40$
-s path tortuosity rises to $\sim$17--23), which we interpret as persistent
-wrong-sign deviations getting ``locked in'' by the long memory. Whether any
-baseline-free readout can recover steering contrast on this dataset is an open
-experiment (\S6).
-
-\subsection{Interpretation --- hypothesis, not conclusion}
-
-Where does the bias come from? Candidate contributors: the fly's largely
-bilateral olfactory pathway, our anatomically naive x-median split, the
-``GNG\_DESC'' group definition mixing descending and ascending neurons, and
-single-specimen hemispheric asymmetries in proofreading or annotation. v2
-leaned toward ``real structure''; v2's cross-dataset result (\S5.4) instead
-suggests a pool-definition artifact. In v3 we explicitly downgrade all such
-attribution to \textbf{hypothesis}: the measurement itself stands, the
-explanation is undecided, and the decisive experiment is
-re-pooling/relabeling on the same FlyWire data (\S6). Practical rule for demo
-builders, unchanged: \textbf{calibrate readout pools against a slow baseline
-and report the bias} --- if your bilateral pools respond equally to both
-sides, your ``steering'' is cosmetic.
-
-\section{Finding 3 --- Seed overfitting: a tuning-methodology lesson}
-
-\subsection{The sweep winner that wasn't}
-
-Because steering is weak and fluctuation-dominated, time-to-first-banana is a
-high-variance metric (in our runs, 12--166 s across seeds for identical
-parameters; the game injects constant current, so the fluctuations arise from
-network dynamics and game-layer randomness, not from any Poisson
-implementation --- v2's ``Poisson noise'' wording was imprecise). We swept
-game-layer readout constants (\texttt{turnGain} $\times$ \texttt{smellSigma}
-$\times$ \texttt{baseSpeed}, then \texttt{turnGain} $\times$ \texttt{emaTau}
-$\times$ \texttt{baseSpeed}; 12 configs $\times$ 5 LCG-seeded runs $\times$
-180 simulated seconds each, brain reset between episodes, full tables in
-\texttt{game/README.md}). The qualitative trends are modest and
-configuration-dependent: in our tables, higher \texttt{turnGain} is associated
-with worse outcomes in most rows, but there are counterexamples --- e.g.\ at
-fixed \texttt{smellSigma}=250 and \texttt{baseSpeed}=12, raising
-\texttt{turnGain} from 2.6 to 4 \emph{improves} mean score from 1.80 to 2.20
---- and enlarging \texttt{emaTau} degrades performance (\S3.2). All first-eat
-statistics below count \textbf{successful episodes only} (a run with no eat
-contributes to the eat-rate but not to first-eat time). The apparent champion,
-\texttt{turnGain} = 1.8, scored 100\% eat rate, 26.4 s median, 3.00 mean
-score across the 5 sweep seeds.
-
-On 10 fresh seeds it collapsed: 8/10 ate, median 57.7 s, mean 73.7 s, mean
-score 1.30 --- \textbf{worse than the status-quo default on the same 10 seeds}
-(10/10, 49.6 s median, 2.70 score). The 5-seed ``win'' was seed luck. A
-configuration-reproducibility caveat adds a second layer: the champion's 3.00
-was measured when \texttt{bananaMaxDist} was still unbounded; under the
-current default (\texttt{bananaMaxDist} = 250) the same configuration scores
-2.20, and explicitly restoring the historical unbounded value recovers 3.00
-(both numbers match the reviewer's independent measurements; commands in \S7).
-
-\subsection{What actually helped: level design}
-
-Capping banana spawn distance at 350 px excluded the far corners of the arena
-(max distance from the center-spawned fly is $\approx$362 px), yet produced
-metrics identical to the default in our seed set --- no measurable effect.
-Capping spawns to a 150--250 px ring, however, moved the median
-time-to-first-banana from 49.6 s to \textbf{27.3 s} (10/10 eaten, tortuosity
-8.47 --- still clearly wandering search rather than a $\approx$1 straight-line
-beeline). The ``fast search'' family (higher speed gain / max speed, rewriting
-the rate$\to$speed readout mapping) tells a mixed story and was rejected:
-fast-search alone improved the median (38.6 s $<$ 49.6 s) but \emph{reduced}
-the eat rate to 9/10 and the mean score to 1.80; ring+fast combined was worse
-than ring-only on the median (42.6 s $>$ 27.3 s) while scoring 3.10 --- a
-score gain we attribute to faster wandering covering the ring sooner, not to
-any readout improvement, and we did not adopt it.
-
-\subsection{Honest-tuning principle}
-
-The final shipped defaults change \emph{only} the level-design constant
-(\texttt{bananaMaxDist} = 250). Every constant in the
-sensory$\to$brain$\to$readout mapping is unchanged, so the demo's core claim
---- ``the brain's readout participates in the decision'' --- carries no hidden
-tuning water. Two methodological lessons generalize beyond games. First:
-\textbf{behavioral metrics with high stochastic variance must be validated
-out-of-sample; a small-seed sweep does not estimate the parameter effect, it
-estimates the seed set.} Second, disclosed in v3: \textbf{the seeds (101--110)
-used to select the level-design constant were also used to evaluate it ---
-they are no longer an independent test set.} We kept both tables in the repo
-README precisely so the selection is auditable.
-
-\section{Cross-dataset replication on MaleCNS}
-
-Everything in \S2--\S4 was first measured on FlyWire. We then re-ran the same
-probe battery on MaleCNS v1.0 through the identical simulation core. Full
-tables and commands are in \texttt{docs/malecns-probes.md} and
-\texttt{docs/results/}.
-
-\subsection{Preprocessing caveats}
-
-\textbf{Both datasets are $\ge$5-synapse filtered.} v2 claimed the FlyWire
-package ``keeps aggregated connections of any strength'' --- that was wrong.
 Unsigned aggregation of the FlyWire source CSVs yields a minimum connection
 weight of 5.0 with zero neuron pairs below 5 (2,700,513 unsigned pairs; the
 2,277-pair difference to the binary's 2,698,236 edges is pairs whose signed
 weights cancel to exactly zero and are dropped). The MaleCNS bundle is
 likewise thresholded at $\ge$5 synapses (6,287,749 connections) and
-additionally drops autapses.
+additionally drops autapses. An earlier version of this note wrongly described
+the FlyWire package as unfiltered and used that to explain dynamical
+differences; that account was retracted (Appendix A).
 
-\textbf{The neurotransmitter sign rules differ between packages --- a major
-confound.}
+\subsection{The neurotransmitter sign tables differ --- a major confound}
 
 \begin{center}
-\begin{tabular}{lll}
+\footnotesize
+\begin{tabular}{L{2.4cm} L{5.4cm} L{6.4cm}}
 \toprule
 transmitter & FlyWire package (snedea \texttt{NT\_SIGN}) & MaleCNS package (fly-brain-minecraft) \\
 \midrule
@@ -389,60 +188,56 @@ monoamines (DA/OA/5-HT) & $+1$ excitatory & $+1$ excitatory \\
 \end{tabular}
 \end{center}
 
-Correction history on histamine (kept for transparency): v3 incorrectly
-claimed both packages treat histamine as inhibitory; v4 over-corrected by
-adding ``no entry $\to$ default $+1$, photoreceptors directly affected''. Both
-were wrong in different ways. The facts, verified by scanning every
-\texttt{nt\_type} label in the FlyWire source \texttt{connections.csv.gz}
-(3,869,878 rows): the label set is exactly six classes --- ACH 2,258,155; GABA
-865,318; GLUT 654,183; DA 37,705; SER 37,450; OCT 17,067 --- \textbf{with no
-histamine and no empty labels}. FlyWire's six-class transmitter prediction
-simply does not include histamine, and neurons (including photoreceptors) are
-labeled with one of these six classes; \textbf{the absence of a predicted
-class cannot be used to infer how real histaminergic neurons are signed in the
-FlyWire package}. The MaleCNS package, by contrast, explicitly assigns $-1$ to
-8,021 histamine-labeled nodes (that count is the total of histamine-labeled
-nodes, not a photoreceptor count). Glutamatergic neurons are abundant in both
-datasets (MaleCNS: 29,763 neurons, $\sim$17\%). Cross-dataset dynamical
-differences below must be read against these sign-table differences. Other
-differences remain: sex (female/male), VNC (absent/present), individuals, and
+Facts verified by scanning every \texttt{nt\_type} label in the FlyWire source
+\texttt{connections.csv.gz} (3,869,878 rows): the label set is exactly six
+classes --- ACH 2,258,155; GABA 865,318; GLUT 654,183; DA 37,705; SER 37,450;
+OCT 17,067 --- \textbf{with no histamine and no empty labels}. FlyWire's
+six-class transmitter prediction simply does not include histamine, and
+neurons (including photoreceptors) are labeled with one of these six classes;
+\textbf{the absence of a predicted class cannot be used to infer how real
+histaminergic neurons are signed in the FlyWire package}. The MaleCNS package
+explicitly assigns $-1$ to 8,021 histamine-labeled nodes (a count of
+histamine-labeled nodes, not of photoreceptors). Glutamatergic neurons are
+abundant in both datasets (MaleCNS: 29,763, $\sim$17\%). Other differences
+that remain: sex (female/male), VNC (absent/present), individuals, and
 packaging pipelines.
 
-\subsection{Finding 1 --- replicated at reference gain, and gain-bounded}
+\subsection{Same normalization structure, drifting working point}
 
-Covered in \S2.1 and \S2.3: global-max normalization fails at the reference
-gain on both datasets (100-tick observed maxima 0.780 / 0.977, zero central
-spikes), and a small number of central spikes appears at $10\times$ gain (16 /
-131 central spikes). The cross-dataset statement that survives review is
-therefore narrow but robust: \textbf{at the reference gain of the reference
-implementation, global-max normalization does not propagate on either
-aggregated connectome.}
+With postsynaptic L1 normalization, both datasets show the same layered
+reachability under olfactory drive (200-tick probes, I=1.0): ti=1.0 dies at
+the mushroom-body entrance, ti=2.0 ignites the mushroom body but not
+descending neurons, ti=3.0 first reaches them, ti=4.0 makes them usable:
 
-\subsection{targetInput --- structure replicates, the working point drifts; sign rules, not filtering, drive the ignition difference}
+\begin{center}
+\footnotesize
+\begin{tabular}{L{1.8cm} L{6.6cm} L{5.6cm}}
+\toprule
+targetInput & FlyWire (200 ticks) & MaleCNS (200 ticks) \\
+\midrule
+1.0 & MB\_KC 2,544, GNG\_DESC 0 & MB\_KC 148, DN 0 \\
+2.0 & MB\_KC 57,446, GNG\_DESC 10 & MB\_KC 37,237, DN 0 \\
+3.0 & GNG\_DESC 3,810; stable over 500 ticks of maximal bilateral input & DN 11; VIS\_OL 0 \\
+4.0 & whole-brain high activity (VIS\_ME 405,788 spikes/200 ticks, zero visual input) & DN 75; VIS\_OL 2 (no ignition) \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-The per-neuron sweep (\S2.2 table) reproduces the same layered reachability on
-MaleCNS --- 1.0 dies at the mushroom-body entrance, 2.0 ignites the mushroom
-body but not descending neurons, 3.0 first reaches them (DN 11), 4.0 makes
-them usable (DN 75). Two quantitative differences from FlyWire:
+Two quantitative differences: the olfactory$\to$descending drive is $\sim$2
+orders of magnitude weaker on MaleCNS (11 vs 3,810 per 200 ticks at ti=3.0 ---
+pure command-DN superclass vs FlyWire's mixed GNG\_DESC group, plus sign-rule
+effects); and \textbf{MaleCNS shows no FlyWire-style high visual-lobe activity
+at ti=4.0} (VIS\_OL 2 vs VIS\_ME 405,788). \S3 shows what accounts for the
+second difference.
 
-First, the olfactory$\to$descending-neuron drive is \textbf{about two orders
-of magnitude weaker} (11 vs 3,810 GNG\_DESC spikes per 200 ticks at ti=3.0).
-Candidate contributors: MaleCNS's \texttt{descending\_neuron} superclass is a
-pure brain$\to$VNC command population several synapses from the olfactory
-entry, whereas FlyWire's ``GNG\_DESC'' group mixes in directly sensory-driven
-neurons; and the sign-rule difference changes net excitation everywhere.
+\section{The bidirectional sign intervention (causal core)}
 
-Second --- and here v2's attribution must be retracted --- \textbf{MaleCNS
-shows no FlyWire-style high visual-lobe activity at ti=4.0} (VIS\_OL: 2
-spikes, versus VIS\_ME 405,788 spikes/200 ticks on FlyWire). v2 attributed
-this to MaleCNS's $\ge$5-synapse filtering; that attribution was void (\S5.1:
-both datasets are filtered). The replacement hypothesis was the sign-table
-difference, and we tested it in both directions:
-
+\begin{sloppypar}
 \textbf{Forward experiment (sufficiency, MaleCNS).} We regenerated the MaleCNS
 binary with only the glutamate sign flipped from $-1$ to $+1$
 (\texttt{python game/tools/flyb\_to\_bin.py {-}{-}glut-excitatory}, 29,763
 neurons flipped; all other parameters identical), and ran the ti=3/4 probes:
+\end{sloppypar}
 
 \begin{center}
 \begin{tabular}{lccc}
@@ -459,7 +254,7 @@ MaleCNS GLUT-excitatory, ti=3.0 & 492,145 & 1,025 & 41 \\
 
 \textbf{Reverse experiment (necessity, FlyWire).} We rebuilt the FlyWire
 binary from the source connection table with only the glutamate sign flipped
-from $+1$ to $-1$ --- i.e.\ the source rows are re-aggregated and
+from $+1$ to $-1$ --- the source rows re-aggregated and
 postsynaptic-L1-normalized identically, differing only in the sign rule
 (\texttt{python game/tools/build\_flywire\_variant.py}; equivalence
 self-check: a standard-sign rebuild reproduces the shipped
@@ -467,6 +262,7 @@ self-check: a standard-sign rebuild reproduces the shipped
 and ran the same probes:
 
 \begin{center}
+\footnotesize
 \begin{tabular}{lccc}
 \toprule
 variant & total spikes (200 ticks) & GNG\_DESC & VIS\_ME \\
@@ -483,138 +279,123 @@ FlyWire GLUT-inhibitory, ti=4.0 & 291,831 & 113 & \textbf{0} \\
 change: it alters the edge set by 517 edges (2,698,753 vs 2,698,236, from
 changed cancellation), the weights of 77,650 shared edges, and 23,905
 postsynaptic L1 denominators. These are consequences of the same rule
-intervention, not an additional confound --- but ``the graph'' here therefore
-means the fixed source connection table re-aggregated under each sign rule,
-not one frozen weighted graph.
+intervention, not an additional confound --- ``the graph'' here means the
+fixed source connection table re-aggregated under each sign rule, not one
+frozen weighted graph.
 
-What these two experiments establish, stated as narrowly as the data allow:
-\textbf{at ti=4, I=1, 200 ticks, and across the two GLUT sign configurations
-compared, flipping only the glutamate sign is sufficient to cause high
-visual-lobe activity on the MaleCNS-derived graph, and flipping it back
-abolishes that activity on the FlyWire-derived graph (405,788 $\to$ 0) ---
-the glutamate sign assignment is both sufficient and necessary for the
-high-activity regime under exactly these conditions.} The ti=3 rows are
-reported for completeness and are \emph{not} part of this conclusion. This
-directly supports sign assignment as a major contributing factor to the
-cross-package dynamical difference; it does not prove sign tables explain
-\emph{all} cross-dataset differences (drive asymmetry, anatomy, and filtering
-still differ). Excitability is partly a packaging choice: Shiu et al.\ assign
-glutamate to the inhibitory category (GluCl), the FlyWire browser package to
-the excitatory one, and the resulting networks sit in measurably different
-dynamical regimes. (\texttt{node game/tools/probe\_signflip.mjs}; archives
-\texttt{docs/results/probe\_signflip.txt},
-\texttt{docs/results/signflip\_flywire.txt}.)
+\textbf{Conclusion, stated as narrowly as the data allow: at ti=4, I=1, 200
+ticks, and across the two GLUT sign configurations compared, flipping only the
+glutamate sign is sufficient to cause high visual-lobe activity on the
+MaleCNS-derived graph, and flipping it back abolishes that activity on the
+FlyWire-derived graph (405,788 $\to$ 0) --- the glutamate sign assignment is
+both sufficient and necessary for the high-activity regime under exactly these
+conditions.} The ti=3 rows are reported for completeness and are \emph{not}
+part of this conclusion.
 
-The practical advice to the community sharpens accordingly: \textbf{run a
-per-dataset propagation test, publish the working point and the sign table ---
-there is no universal constant, and there is no universal sign convention
-either.}
+\textbf{Boundary statement.} This is a causal result about \textbf{sign
+perturbations inside the model} --- it tells us which packaging choice drives
+the simulated high-activity regime. It licenses \textbf{no inference about
+real fly glutamatergic biology}: whether glutamate acts excitatorily or
+inhibitorily at any given synapse in the animal is a physiological question,
+and a mechanistic claim would require physiological or behavioral evidence,
+not network perturbations. (For orientation, not evidence: Shiu et al.\ assign
+glutamate to the inhibitory category via GluCl, the FlyWire browser package to
+the excitatory one.)
 
-\subsection{Finding 2 --- not replicated under the tested MaleCNS conditions}
+\section{Related validation work, and what this note adds}
 
-With MaleCNS's \emph{native} \texttt{somaSide} pool split and adequate drive
-(ti=4.0), the lateral contrast is \textbf{correctly signed}:
+\textbf{fly-brain-minecraft \texttt{docs/VALIDATION.md}.} The upstream MaleCNS
+demo already keeps an exemplary validation record: a silent-brain check, a
+sugar$\to$MN9 feeding bench reproducing the paper pathway, a gain sweep (their
+scheme is Shiu's fixed \texttt{w\_syn = 0.275 mV $\times$ gain}; gain 0.65
+chosen as the smallest value driving MN9 robustly while Kenyon cells stay
+silent, with runaway excitation documented at 0.75 --- KCs firing at 39 Hz and
+grooming DNs shut down), per-table commands and seeds, and an honestly labeled
+olfaction limitation: their antennal-lobe PNs saturate ($\sim$134 Hz mean from
+a 40 Hz input), descending neurons show a diffuse $\sim$9 Hz with \textbf{no
+clear steering signal}, so odor-directed walking is handled by a hand-built
+reflex layer. Absolute firing rates are explicitly marked untrustworthy.
 
-\begin{center}
-\begin{tabular}{llccc}
-\toprule
-drive & stimulus & desc\_left & desc\_right & L/(L+R) \\
-\midrule
-ti=3.0, 200 ticks & left antenna pool & 5 & 6 & 0.455 \\
-ti=3.0, 200 ticks & right antenna pool & 12 & 15 & 0.444 \\
-ti=4.0, 400 ticks & left antenna pool & 91 & 66 & \textbf{0.580} \\
-ti=4.0, 400 ticks & right antenna pool & 111 & 118 & \textbf{0.485} \\
-\bottomrule
-\end{tabular}
-\end{center}
+\textbf{flybench.} A community behavioral benchmark for whole-brain fruit-fly
+connectome simulations: pre-registered, cited behavioral tasks on FlyWire v783
+and MaleCNS, shuffled-wiring controls, and a reference LIF implementation ---
+i.e.\ cross-graph, control-included evaluation rather than single-demo
+anecdotes.
 
-The left--right difference between the two ti=4 rows is
-\textbf{$91/157 - 111/229 \approx 0.09490$ (9.49 percentage points)}. At
-ti=3.0 the DN counts are too small (5--15 spikes per pool in 200 ticks;
-10--34 in 400 ticks) for any bias statistic.
+\textbf{What this note adds.} (i) A \textbf{bidirectional causal intervention}
+on the sign table: the upstream record documents one package's behavior on one
+graph; we isolate a single packaging rule and show sufficiency \emph{and}
+necessity across two graphs (\S3). (ii) A \textbf{cross-package audit method}:
+rebuild from source under a changed rule with an equivalence self-check
+(2,698,236 edges, zero mismatches) before trusting the variant. (iii) A
+\textbf{fully frozen public pipeline}: every number in this note regenerates
+from one command per row (\S7), including probes the upstream record leaves
+qualitative (reference-gain failure, lateral readout bias, gain dependence).
+Where we converge with the upstream record --- weak or absent
+odor$\to$DN steering, a gain cliff into runaway excitation, and the need for
+per-dataset calibration --- the convergence is itself evidence that these are
+packaging- and model-level phenomena, not demo-specific accidents.
 
-What can and cannot be concluded. Under the tested MaleCNS conditions, the
-wrong-direction bias does not appear. But the two measurements differ in
-dataset, individual, sex, VNC presence, \textbf{sign tables}, pool
-definitions, and working point all at once --- so ``pool-definition artifact''
-(v2's preferred reading) remains \textbf{a hypothesis, not a conclusion}. The
-decisive experiment changes only the pooling on a fixed dataset: re-split
-FlyWire's descending population by alternative rules (e.g.\ hemispheric
-relabeling, ascending-excluded re-pooling) and re-measure (\S6, next
-experiments). One related observation, kept strictly within MaleCNS: its
-ascending neurons (AN group) fired 0 times in 200 ticks under olfactory
-stimulation (versus 710 under bristle stimulation). Whether FlyWire's mixed
-GNG\_DESC group derives any of its olfactory responsiveness from its own
-ascending component \textbf{has not been verified} --- we removed the v3
-sentence that claimed otherwise.
+\section{Methodological recommendations (for the ``dynamics on connectomes'' community)}
 
-\textbf{Statistical disclosures.} (i) The MaleCNS olfactory stimulus pools are
-asymmetric: 411 unknown-side ORNs were assigned to the left/right pools by
-index parity, giving 1,090 (left) vs 1,549 (right) neurons --- at equal
-per-neuron current, the right pool receives $\approx$42\% more total input.
-(ii) 10 midline descending neurons were assigned to the pools by parity.
-(iii) Each probe condition is a single deterministic trajectory; spike counts
-within a run are not independent samples, and ti=4.0 does not by itself make
-the comparison statistically adequate. (iv) The heuristic high-pass readout
-of \S3.2 remains the readout used in the game on both datasets.
-
-\subsection{Biological sanity checks (small, but free)}
-
-\begin{itemize}
-\item \textbf{DNp01 (giant fiber) does not respond to bristle stimulation}: 0
-spikes in 20 ticks of strong mechanosensory-bristle drive --- consistent with
-its known biology as a visually (looming-) triggered escape neuron. The game's
-escape path therefore keys on the descending-rate surge (bristle drives
-ascending/central activity strongly, 710 AN spikes in the same probe), not on
-DNp01.
-\item \textbf{The feeding chain works on MaleCNS}: gustatory pool at I=1.2
-drives the MN9-class proboscis motor readout (16 cb\_motor neurons) to 3
-spikes in 30 ticks (first at tick 22) --- at the game's feeding-gate
-threshold, and the headless closed loop on MaleCNS eats bananas for real
-(score 1--3 per 180 s across seeds, first eats 49--172 s; steering is
-legitimately ``hard mode'': DN rates of $\sim$2--8 spikes/s at distance,
-rising to 34--42/s at close range).
-\end{itemize}
+\begin{enumerate}
+\item \textbf{Run a per-dataset propagation test and publish the working point
+\emph{and} the sign table.} There is no universal gain constant (3.0 vs 4.0
+here), no universal sign convention (\S2.2), and reference-gain global-max
+silently fails on both packages we tested (\S1.1-P1). A silent network at
+reference settings is the default outcome, not a bug in your stimulus.
+\item \textbf{Calibrate readout pools against a slow baseline and disclose the
+bias} --- if bilateral pools respond equally to both sides, ``steering'' is
+cosmetic (\S1.1-P2); report the bias magnitude and the readout heuristic used.
+\item \textbf{Validate high-variance behavioral metrics out-of-sample},
+disclose which seeds selected and which evaluated, and disclose
+first-eat-style ``successful episodes only'' statistics (\S1.1-P3).
+\item \textbf{Disclose explicit motor/game rules.} A closed loop can look
+brain-driven while scripted rules do the walking (\S1); name them.
+\item \textbf{Treat absolute firing rates as untrustworthy} (echoing the
+upstream record): report differences between stimulated and unstimulated
+conditions and orderings between pathways, not absolute values.
+\end{enumerate}
 
 \section{Limitations and open questions}
 
-Limitations. Point LIF neurons without conductances, delays, neuromodulation,
-or plasticity; no gap junctions; transmitter signs from prediction pipelines
-with package-specific sign rules that materially change dynamics (\S5.1,
-\S5.3); two individuals (one female FAFB, one male MaleCNS) with different
-packaging pipelines; FlyWire has no ventral nerve cord, and even on MaleCNS we
-do not simulate real gait; \textbf{the game contains explicit motor rules
-(\S1.1)}; per-dataset stimulus gains are acknowledged level design; probe
-conditions are single deterministic trajectories, and the level-design seed
-set doubles as its evaluation set (\S4.3). None of this claims biological
-fidelity, let alone ``uploading''.
+Point LIF neurons without conductances, delays, neuromodulation, or
+plasticity; no gap junctions; transmitter signs from prediction pipelines with
+package-specific sign rules that materially change dynamics (\S2.2, \S3); two
+individuals (one female FAFB, one male MaleCNS) with different packaging
+pipelines; FlyWire has no ventral nerve cord, and even on MaleCNS we do not
+simulate real gait; the game contains explicit motor rules (\S1); per-dataset
+stimulus gains are acknowledged level design; probe conditions are single
+deterministic trajectories, and the level-design seed set doubles as its
+evaluation set (\S1.1-P3). None of this claims biological fidelity, let alone
+``uploading''.
 
-Next experiments (ordered):
+Open questions, ordered:
 \begin{enumerate}
-\item \textbf{Decisive test for the Finding 2 attribution}: on the \emph{same}
-FlyWire data, re-pool the descending population under alternative rules
-(hemispheric relabeling, ascending-excluded, native-side annotations from
-FlyWire's own classification) and re-measure the unilateral-stimulus contrast.
-If the wrong-direction bias vanishes under alternative pooling, the artifact
-reading is confirmed on that dataset.
-\item \textbf{BANC replication} of the global-max reference-gain failure
-(one-command dataset swap), plus a record of each packaging's sign table as a
-mandatory companion to any dynamical comparison.
-\item \textbf{Named-DN readouts}: which specific descending types (e.g.\ the
-turn/halt DNs characterized in the literature) restore steering contrast
-without any baseline subtraction, on either dataset?
-\item \textbf{Gain stability}: characterize whether the $10\times$ global-max
-gain (\S2.3) yields usable, non-seizing dynamics or merely pushes the failure
-threshold higher.
+\item \textbf{Decisive test for the readout-bias attribution}: on the
+\emph{same} FlyWire data, re-pool the descending population under alternative
+rules (hemispheric relabeling, ascending-excluded, native-side annotations)
+and re-measure the unilateral-stimulus contrast.
+\item \textbf{BANC replication} of the reference-gain failure and of the
+sign-intervention protocol, with each packaging's sign table published
+alongside.
+\item \textbf{Named-DN readouts}: which specific descending types restore
+steering contrast without any baseline heuristic, on either dataset?
+\item \textbf{Gain stability}: does the $10\times$ global-max regime yield
+usable dynamics or merely move the failure threshold?
 \end{enumerate}
 
 \section{Reproducibility}
 
+\begin{sloppypar}
 All numbers in this note were produced on this repository (Node v24, Python
 3.13, Windows; CPU-only; minutes), \textbf{except where a row is explicitly
-marked as a historical record}. Commit lineage (v1 $\to$ this revision) is
-given on the title line. Vendor data acquisition with pinned commits and
-SHA-256 checksums: \texttt{game/tools/fetch\_vendor\_data.md}. Probe batteries
+marked as a historical record}. Commit lineage: v1 measurements @
+\texttt{d92807b}; v2 probes @ \texttt{73da541}; v3--v4 scripts \& experiments
+@ \texttt{63c54ca} / \texttt{709b188}; v4.1 @ \texttt{80a4768}; this revision:
+see the title line (placeholder to be filled on commit). Vendor data
+acquisition with pinned commits and SHA-256 checksums:
+\texttt{game/tools/fetch\_vendor\_data.md}. Probe batteries
 are frozen as scripts (\texttt{probe\_flywire.mjs},
 \texttt{probe\_malecns.mjs}, \texttt{probe\_gain.mjs},
 \texttt{probe\_signflip.mjs}, \texttt{probe\_supplementary.mjs},
@@ -622,10 +403,12 @@ are frozen as scripts (\texttt{probe\_flywire.mjs},
 \texttt{game/docs/results/} with the producing command in each file's header.
 Timing fields (ms/tick) fluctuate with machine load and are not bit-stable;
 all spike counts are.
+\end{sloppypar}
 
+\begin{sloppypar}
 \begin{center}
-\small
-\begin{tabular}{L{8.6cm} L{6.2cm}}
+\footnotesize
+\begin{tabular}{L{8.2cm} L{6.6cm}}
 \toprule
 number(s) & command \\
 \midrule
@@ -641,43 +424,80 @@ sign-flip bidirectional probe & \texttt{node game/tools/probe\_signflip.mjs} \\
 MaleCNS feeding/escape/ascending probes & \texttt{node game/tools/probe\_supplementary.mjs} \\
 FlyWire closed loop (seed 7: first eat 34.8 s, score 2/120 s) & \texttt{node game/tools/headless\_run.mjs 120 '\{\}' 7 flywire} \\
 MaleCNS closed loop (score 1, first eat 104.3 s) & \texttt{node game/tools/headless\_run.mjs 180 '\{\}' 7 malecns} \\
-sweep round 1 & \texttt{node game/tools/tune\_sweep.mjs '\{"turnGain":[2.6,4,6],"smellSigma":[130,250],"baseSpeed":[6,12],"bananaMaxDist":[null]\}'} \\
-sweep round 2 & \texttt{node game/tools/tune\_sweep.mjs '\{"turnGain":[1.8,2.6],"emaTau":[5,20,40],"baseSpeed":[6,12],"bananaMaxDist":[null]\}'} \\
-champion config, historical default restored (3.00; 2.20 under current default) & \texttt{node game/tools/tune\_sweep.mjs '\{"turnGain":[1.8],"emaTau":[5],"baseSpeed":[6],"bananaMaxDist":[null]\}'} \\
-out-of-sample \& level-design comparisons (reproduces the \S4.2 table exactly) & \texttt{node game/tools/reproduce\_sweeps.mjs} \\
+sweep rounds 1--2 (historical default restored) & \texttt{node game/tools/tune\_sweep.mjs '<grid JSON with "bananaMaxDist":[null]>'} \\
+champion config, historical default restored (3.00; 2.20 under current default; grid: turnGain 1.8, emaTau 5, baseSpeed 6, bananaMaxDist null --- JSON also in results file header) & \texttt{node game/tools/tune\_sweep.mjs '<champion grid JSON>'} \\
+out-of-sample \& level-design comparisons + champion out-of-sample (8/10, 57.7 s, 1.30) & \texttt{node game/tools/reproduce\_sweeps.mjs} \\
 \bottomrule
 \end{tabular}
 \end{center}
+\end{sloppypar}
 
 Notes on exactness. \texttt{"bananaMaxDist":[null]} in the sweep commands
 explicitly restores the historical unbounded spawn distance (\texttt{null}
-$\to\infty$ in \texttt{harness.mjs}); without it, today's default (250)
-silently changes the historical tables --- the reviewer's 2.20-vs-3.00
-discrepancy was exactly this. Seeded runs use an injectable LCG replacing
-\texttt{Math.random}; episodes call \texttt{sim.reset()} between runs so one
-process reuses a single parsed brain. Headless runs are not real-time
-throttled. Honest reuse note: seeds 101--110 served both for selecting
-\texttt{bananaMaxDist} and for evaluating it (\S4.3); first-eat statistics
-count successful episodes only. One row is a \textbf{historical record not
-rebuilt by script}: the 350 px no-effect comparison of \S4.2 (its
-configuration is documented in the \texttt{game/README.md} tuning log); every
-other number in the tables above is reproduced by the listed commands today.
+$\to\infty$ in \texttt{harness.mjs}). Seeded runs use an injectable LCG
+replacing \texttt{Math.random}; episodes call \texttt{sim.reset()} between
+runs. Headless runs are not real-time throttled. Honest reuse note: seeds
+101--110 served both for selecting \texttt{bananaMaxDist} and for evaluating
+it; first-eat statistics count successful episodes only. One row is a
+\textbf{historical record not rebuilt by script}: the 350 px no-effect
+comparison (configuration documented in the \texttt{game/README.md} tuning
+log); every other number in the tables above is reproduced by the listed
+commands today.
+
+\appendix
+\section{Correction history (chronology, condensed)}
+
+The review-driven corrections, in order, each with its disposition. Full
+point-by-point detail: \texttt{docs/REVIEW-RESPONSE.md}.
+
+\begin{itemize}
+\item \textbf{v2 $\to$ v3 (first review).} Finding 1 scoped to reference gain
+(gain $\times$10 retest: 16/131 central); Shiu misattribution corrected
+(postsynaptic L1 is this project's scheme, not Shiu's \texttt{w\_syn}); ``no
+hand-crafted behavior layer'' claim replaced by the explicit-rules list;
+Finding 2 attribution downgraded to hypothesis; statistical disclosures added
+(pool asymmetry 1,090/1,549; single deterministic trajectories; lateral
+difference corrected to 9.49 percentage points); reproducibility entries
+frozen into scripts and \texttt{docs/results/}; seed-reuse disclosure.
+\item \textbf{v3 $\to$ v4 (second review).} Histamine sign-table correction
+(v3's ``both inhibitory'' was wrong; v4's interim ``default $+1$,
+photoreceptors affected'' was also wrong --- see v4.1); FlyWire reverse
+sign-flip experiment added (necessity), with equivalence self-check; frozen
+\texttt{probe\_gain.mjs} / \texttt{probe\_signflip.mjs}; explicit-seed
+closed-loop records (34.8 s); historical sweep commands given explicit
+\texttt{"bananaMaxDist":[null]}; vendor acquisition doc with SHA-256.
+\item \textbf{v4 $\to$ v4.1 (third review, ``minor revisions'').} Histamine
+account corrected to the six-class-labels evidence (no histamine class in
+FlyWire's prediction; no inference about real histaminergic signing);
+reverse-experiment precision (source-table re-aggregation wording; scope note
+517/77,650/23,905; ``sufficient and necessary'' restricted to ti=4, I=1, 200
+ticks, GLUT $\pm$); two final frozen reproduction entries
+(\texttt{probe\_supplementary.mjs}, \texttt{reproduce\_sweeps.mjs});
+``asymptote'' wording replaced by 100-tick observed maxima; fast-search
+comparison written out in full.
+\item \textbf{v4.1 $\to$ v5 (fourth review, this restructure).} FlyWire
+license corrected to CC BY-NC 4.0 per the official guidelines (earlier CC
+BY-NC-SA 4.0 was an assumption); note restructured around the
+packaging-choices mainline with correction chronology moved here;
+precedent-comparison section added; boundary statement for the causal claim
+added; Fandol fonts for the LaTeX source.
+\end{itemize}
 
 \begin{thebibliography}{99}
 \footnotesize
 \bibitem{bates2026} Bates, A. S., Phelps, J. S., et al. (2026). Distributed
 control circuits across a brain-and-cord connectome. \emph{Nature}.
 \url{https://doi.org/10.1038/s41586-026-10735-w}
+\bibitem{fbm} blendi-remade/fly-brain-minecraft (2026). Minecraft mod driven
+by the MaleCNS connectome; source of the FLYB v1 binary packaging of neuPrint
+male-cns:v1.0 used here, and of the validation record
+(\texttt{docs/VALIDATION.md}) discussed in \S4.
+\url{https://github.com/blendi-remade/fly-brain-minecraft} (MIT)
 \bibitem{flybench} brandoncho369/flybench (2026). Behavioural benchmark for
 whole-brain fruit fly connectome simulations: pre-registered, cited
 behavioural tasks on FlyWire v783 and MaleCNS with shuffled-wiring controls
 and a reference LIF implementation.
 \url{https://github.com/brandoncho369/flybench} (MIT)
-\bibitem{fbm} blendi-remade/fly-brain-minecraft (2026). Minecraft mod driven
-by the MaleCNS connectome; source of the FLYB v1 binary packaging of neuPrint
-male-cns:v1.0 used here (format spec and full transformation log in its
-\texttt{PROVENANCE.md}).
-\url{https://github.com/blendi-remade/fly-brain-minecraft} (MIT)
 \bibitem{beiran2025} Beiran, M. \& Litwin-Kumar, A. (2025). \emph{Nature
 Neuroscience} 28: 2561--2574（连接组只部分约束动力学）. Code:
 \url{https://github.com/emebeiran/connconstr} ; data:
