@@ -1,0 +1,198 @@
+{
+  "dataset": "male-cns:v1.0",
+  "neuron_count": 176422,
+  "edge_count": 6287749,
+  "region_types": {
+    "sensory": 0,
+    "central": 1,
+    "drives": 2,
+    "motor": 3
+  },
+  "group_count": 26,
+  "group_sizes": [
+    6098,
+    89403,
+    9766,
+    2639,
+    700,
+    444,
+    1428,
+    2206,
+    590,
+    3037,
+    91,
+    1669,
+    133,
+    4064,
+    97,
+    340,
+    2950,
+    23569,
+    1889,
+    13161,
+    9809,
+    94,
+    1332,
+    708,
+    111,
+    94
+  ],
+  "groups": [
+    {
+      "id": 0,
+      "name": "VIS_PHOTO",
+      "region": "sensory",
+      "neuron_count": 6098
+    },
+    {
+      "id": 1,
+      "name": "VIS_OL",
+      "region": "sensory",
+      "neuron_count": 89403
+    },
+    {
+      "id": 2,
+      "name": "VIS_VPN",
+      "region": "sensory",
+      "neuron_count": 9766
+    },
+    {
+      "id": 3,
+      "name": "OLF_ORN",
+      "region": "sensory",
+      "neuron_count": 2639
+    },
+    {
+      "id": 4,
+      "name": "OLF_PN",
+      "region": "sensory",
+      "neuron_count": 700
+    },
+    {
+      "id": 5,
+      "name": "OLF_LN",
+      "region": "sensory",
+      "neuron_count": 444
+    },
+    {
+      "id": 6,
+      "name": "GUS",
+      "region": "sensory",
+      "neuron_count": 1428
+    },
+    {
+      "id": 7,
+      "name": "MECH_BRISTLE",
+      "region": "sensory",
+      "neuron_count": 2206
+    },
+    {
+      "id": 8,
+      "name": "MECH_JO",
+      "region": "sensory",
+      "neuron_count": 590
+    },
+    {
+      "id": 9,
+      "name": "MECH_OTHER",
+      "region": "sensory",
+      "neuron_count": 3037
+    },
+    {
+      "id": 10,
+      "name": "THERMO_HYGRO",
+      "region": "sensory",
+      "neuron_count": 91
+    },
+    {
+      "id": 11,
+      "name": "VNC_SENSORY",
+      "region": "sensory",
+      "neuron_count": 1669
+    },
+    {
+      "id": 12,
+      "name": "GENERIC_SENSORY",
+      "region": "sensory",
+      "neuron_count": 133
+    },
+    {
+      "id": 13,
+      "name": "MB_KC",
+      "region": "central",
+      "neuron_count": 4064
+    },
+    {
+      "id": 14,
+      "name": "MBON",
+      "region": "central",
+      "neuron_count": 97
+    },
+    {
+      "id": 15,
+      "name": "DAN",
+      "region": "central",
+      "neuron_count": 340
+    },
+    {
+      "id": 16,
+      "name": "CX",
+      "region": "central",
+      "neuron_count": 2950
+    },
+    {
+      "id": 17,
+      "name": "CB_INTRINSIC",
+      "region": "central",
+      "neuron_count": 23569
+    },
+    {
+      "id": 18,
+      "name": "AN",
+      "region": "central",
+      "neuron_count": 1889
+    },
+    {
+      "id": 19,
+      "name": "VNC_INTRINSIC",
+      "region": "central",
+      "neuron_count": 13161
+    },
+    {
+      "id": 20,
+      "name": "GENERIC_CENTRAL",
+      "region": "central",
+      "neuron_count": 9809
+    },
+    {
+      "id": 21,
+      "name": "DRIVE_ENDO",
+      "region": "drives",
+      "neuron_count": 94
+    },
+    {
+      "id": 22,
+      "name": "DN",
+      "region": "motor",
+      "neuron_count": 1332
+    },
+    {
+      "id": 23,
+      "name": "MN_VNC",
+      "region": "motor",
+      "neuron_count": 708
+    },
+    {
+      "id": 24,
+      "name": "MN_CB",
+      "region": "motor",
+      "neuron_count": 111
+    },
+    {
+      "id": 25,
+      "name": "MN_VNC_EFF",
+      "region": "motor",
+      "neuron_count": 94
+    }
+  ]
+}
