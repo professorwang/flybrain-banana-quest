@@ -1,5 +1,8 @@
 # 上游只读克隆（社区项目 snedea/flybrain，MIT）
 vendor/
+# 例外：游戏自带的第三方库（three.js 本地化，必须入库）
+!game/vendor/
+!game/vendor/**
 
 # Python
 __pycache__/

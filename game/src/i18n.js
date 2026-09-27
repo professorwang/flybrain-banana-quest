@@ -67,6 +67,9 @@ const STRINGS = {
 
     'ds.flywire': 'FlyWire FAFB v783（雌蝇全脑）',
     'ds.malecns': 'MaleCNS v1.0（雄蝇全中枢神经系，含 VNC）',
+
+    'view.follow': '视角：跟随', 'view.overview': '视角：全景',
+    'view.d3': '3D 视角', 'view.d2': '2D 视角',
   },
 
   en: {
@@ -125,6 +128,9 @@ const STRINGS = {
 
     'ds.flywire': 'FlyWire FAFB v783 (female whole brain)',
     'ds.malecns': 'MaleCNS v1.0 (male full CNS, with VNC)',
+
+    'view.follow': 'View: follow', 'view.overview': 'View: overview',
+    'view.d3': '3D view', 'view.d2': '2D view',
   },
 };
 

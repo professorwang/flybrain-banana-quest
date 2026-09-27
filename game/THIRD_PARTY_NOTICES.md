@@ -1,5 +1,12 @@
 # 第三方声明（Third-Party Notices）
 
+## 0a. Three.js（MIT License）
+
+3D 英雄视角使用 [Three.js](https://threejs.org/) r160（`game/vendor/three.module.js`，
+1.27 MB，下载自 https://unpkg.com/three@0.160.0/build/three.module.js ，零构建直接
+以 ES module 引用）。许可：MIT License，Copyright 2010-2023 Three.js Authors
+（SPDX-License-Identifier: MIT，见文件头部）。
+
 ## 0. MaleCNS 连接组数据（CC BY 4.0）与 fly-brain-minecraft（MIT License）
 
 `?dataset=malecns` 使用的 `game/data/connectome-malecns.bin.gz` 等三件套，

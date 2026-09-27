@@ -131,8 +131,8 @@ export class BrainView {
     ctx.fillStyle = 'rgba(230,230,230,0.85)';
     ctx.font = `${Math.max(9, 9 * (window.devicePixelRatio || 1))}px sans-serif`;
     const SHORT = getLang() === 'en'
-      ? { 0: 'R1-6', 2: 'ME', 6: 'food ORN', 8: 'LN', 9: 'PN', 17: 'KC',
-          29: 'feed', 32: 'sweet', 35: 'DESC', 37: 'hunger', 56: 'prob.' }
+      ? { 0: 'R1-6', 2: 'ME', 6: 'ORN', 8: 'LN', 9: 'PN', 17: 'KC',
+          29: 'FEED', 32: 'SWT', 35: 'DESC', 37: 'HUN', 56: 'PB' }
       : { 0: 'R1-6', 2: 'ME', 6: '嗅食', 8: 'LN', 9: 'PN', 17: 'KC',
           29: '食', 32: '甜味', 35: 'DESC', 37: '饿', 56: '喙' };
     for (const [gid, label] of Object.entries(SHORT)) {

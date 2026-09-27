@@ -36,13 +36,15 @@ main {
 }
 
 #arena-wrap { flex: 0 0 auto; }
-#arena-canvas {
+#arena-canvas, #view3d-canvas {
   width: 560px;
   height: 560px;
   border-radius: 8px;
-  cursor: crosshair;
   display: block;
 }
+#arena-canvas { cursor: crosshair; }
+#view3d-canvas { cursor: grab; }
+#view3d-canvas:active { cursor: grabbing; }
 .hint { font-size: 12px; color: #7d879c; margin: 6px 2px 0; }
 
 #panel {
@@ -198,7 +200,7 @@ footer a { color: #4fc3f7; }
   }
 
   #arena-wrap { width: 100%; }
-  #arena-canvas {
+  #arena-canvas, #view3d-canvas {
     width: 100%;
     max-width: 100%;
     height: auto;          /* 依 canvas 属性比例随屏宽缩放，内部仍是 560x560 逻辑坐标 */

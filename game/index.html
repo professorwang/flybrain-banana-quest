@@ -12,11 +12,14 @@
   <p class="tagline" id="tagline">139,255 个真实连接组神经元（FlyWire FAFB v783）正在驱动这只果蝇 ·
     Eon 的闭环没开源，我们做一个浏览器里能跑的开源版</p>
   <button id="btn-lang" title="Switch language / 切换语言">EN/中</button>
+  <button id="btn-view" data-i18n="view.follow">视角：跟随</button>
+  <button id="btn-3d" data-i18n="view.d3">3D 视角</button>
 </header>
 
 <main>
   <section id="arena-wrap">
     <canvas id="arena-canvas" width="560" height="560"></canvas>
+    <canvas id="view3d-canvas" width="560" height="560" hidden></canvas>
     <p class="hint" data-i18n="hint.arena">操作：点击果蝇 = 触摸惊吓 · 点击空白处 = 把香蕉放到那里</p>
   </section>
 

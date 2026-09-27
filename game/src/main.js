@@ -2,11 +2,12 @@
  * 游戏时钟（rAF，约 60fps）与脑 tick（worker 内 setTimeout 节流，默认 10Hz）解耦。
  */
 import { Pools, FLYWIRE_KEYS, MALECNS_KEYS } from './pools.js';
-import { Game, ARENA } from './game.js';
+import { Game } from './game.js';
 import { Renderer } from './renderer.js';
 import { BrainView } from './brain-view.js';
 import { UI } from './ui.js';
 import { t, applyI18n, toggleLang } from './i18n.js';
+import { View3D } from './view3d.js';
 
 const STIM_SEND_INTERVAL = 100;   // 持续刺激下发节流（ms）
 
@@ -39,13 +40,14 @@ const DATASETS = {
 const dsName = new URLSearchParams(location.search).get('dataset') || 'flywire';
 const DS = DATASETS[dsName] || DATASETS.flywire;
 
-let ui, game, renderer, brainView, pools, worker;
+let ui, game, renderer, brainView, pools, worker, view3d;
 let tickHz = 10;                  // 当前脑 tick 频率（滑块可调）
 let latestStats = null;
 let lastStimSend = 0;
 let lastFrame = 0;
 let neuronCount = 0;              // ready 后记录，供 tagline 模板使用
 let groupCount = 0;
+let view3dActive = false;         // 3D 英雄视角开关（?view=3d 或 localStorage 记忆）
 
 /* 语言切换后需要重绘的动态文本（applyI18n 已处理静态 data-i18n 元素） */
 function refreshDynamicTexts() {
@@ -135,7 +137,27 @@ async function boot() {
     if (DS.cfg) Object.assign(game.cfg, DS.cfg);   // 数据集级游戏层覆盖（见 DATASETS 注释）
     game.placeBanana();
     renderer = new Renderer(document.getElementById('arena-canvas'));
+    view3d = new View3D(document.getElementById('view3d-canvas'));
     bindArenaClick();
+    updateViewButton();
+
+    // 2D 镜头模式切换（跟随/全景，renderer 内部记忆到 localStorage）
+    document.getElementById('btn-view').onclick = () => {
+      renderer.toggleViewMode();
+      updateViewButton();
+    };
+
+    // 3D 英雄视角切换（?view=3d 直接进入；选择记忆 localStorage('efly-view-3d')）
+    view3d.onTap = (e) => {
+      const hit = view3d.pick(e.clientX, e.clientY, game);
+      if (!hit) return;
+      if (hit.type === 'poke') doPoke();
+      else if (hit.type === 'ground') game.placeBanana(hit.x, hit.y);
+    };
+    const want3d = new URLSearchParams(location.search).get('view') === '3d'
+      || localStorage.getItem('efly-view-3d') === '1';
+    document.getElementById('btn-3d').onclick = () => set3dActive(!view3dActive);
+    set3dActive(want3d);
 
     // 窗口尺寸变化（含窄屏旋转/分栏切换）时重建脑活动画布分辨率，去抖 200ms
     let resizeTimer = 0;
@@ -179,16 +201,33 @@ function doPoke() {
   renderer.triggerShockwave();
 }
 
-/* 点击竞技场：点在果蝇附近=触摸惊吓，点在别处=把香蕉放到那里 */
+/* 点击竞技场：点在果蝇附近=触摸惊吓，点在别处=把香蕉放到那里。
+ * 坐标换算必须走 renderer.arenaFromClient（跟随镜头缩放/平移下唯一正确入口）。 */
 function bindArenaClick() {
   const canvas = document.getElementById('arena-canvas');
   canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (ARENA.w / rect.width);
-    const y = (e.clientY - rect.top) * (ARENA.h / rect.height);
+    const [x, y] = renderer.arenaFromClient(e.clientX, e.clientY, rect);
     if (Math.hypot(x - game.fly.x, y - game.fly.y) < 30) doPoke();
     else game.placeBanana(x, y);
   });
+}
+
+function updateViewButton() {
+  document.getElementById('btn-view').textContent =
+    renderer.getViewMode() === 'follow' ? t('view.follow') : t('view.overview');
+}
+
+/* 2D 竞技场 ↔ 3D 英雄视角互换：隐藏时停止对应渲染，按钮文案随状态切换 */
+function set3dActive(on) {
+  view3dActive = !!on;
+  document.getElementById('arena-canvas').hidden = view3dActive;
+  document.getElementById('view3d-canvas').hidden = !view3dActive;
+  document.getElementById('btn-view').hidden = view3dActive;   // 2D 镜头按钮仅 2D 模式可用
+  document.getElementById('btn-3d').textContent = view3dActive ? t('view.d2') : t('view.d3');
+  if (view3dActive) view3d.enable(game);
+  else view3d.disable();
+  localStorage.setItem('efly-view-3d', view3dActive ? '1' : '0');
 }
 
 function frame(ts) {
@@ -203,7 +242,9 @@ function frame(ts) {
   }
 
   game.update(dt);
-  renderer.draw(game, dt);
+  // 视图路由：3D 激活时走 WebGL（2D renderer 本帧跳过），否则走 Canvas 2D
+  if (view3dActive) view3d.update(game, dt);
+  else renderer.draw(game, dt);
   brainView.draw();
   ui.update(game, latestStats);
   requestAnimationFrame(frame);
