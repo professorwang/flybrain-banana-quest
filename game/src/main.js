@@ -6,19 +6,20 @@ import { Game, ARENA } from './game.js';
 import { Renderer } from './renderer.js';
 import { BrainView } from './brain-view.js';
 import { UI } from './ui.js';
+import { t, applyI18n, toggleLang } from './i18n.js';
 
 const STIM_SEND_INTERVAL = 100;   // 持续刺激下发节流（ms）
 
 /* 数据集配置：?dataset=malecns 切换，默认 flywire。
  * malecns 的 targetInput=4.0 是实测值——ti=3 时下行神经元近乎静默，
- * 见 docs/malecns-probes.md 探针 3/4。 */
+ * 见 docs/malecns-probes.md 探针 3/4。labelKey 指向 i18n 的数据集双语名称。 */
 const DATASETS = {
   flywire: {
     connectome: 'data/connectome.bin.gz',
     meta: 'data/neuron_meta.json',
     pools: 'data/pools.json',
     keys: FLYWIRE_KEYS,
-    label: 'FlyWire FAFB v783（雌蝇全脑）',
+    labelKey: 'ds.flywire',
     targetInput: 3.0,
     extraGroups: { mechJo: 11, driveHunger: 37 },   // MECH_JO / DRIVE_HUNGER 组 id
   },
@@ -27,7 +28,7 @@ const DATASETS = {
     meta: 'data/neuron_meta_malecns.json',
     pools: 'data/pools_malecns.json',
     keys: MALECNS_KEYS,
-    label: 'MaleCNS v1.0（雄蝇全中枢神经系，含 VNC）',
+    labelKey: 'ds.malecns',
     targetInput: 4.0,
     extraGroups: { mechJo: null, driveHunger: 21 },  // mech_jo 用原生池；饥饿驱动接 DRIVE_ENDO
     // 游戏层覆盖（实测值，见 docs/malecns-probes.md：MaleCNS 嗅觉→DN 驱动弱、
@@ -43,8 +44,25 @@ let tickHz = 10;                  // 当前脑 tick 频率（滑块可调）
 let latestStats = null;
 let lastStimSend = 0;
 let lastFrame = 0;
+let neuronCount = 0;              // ready 后记录，供 tagline 模板使用
+let groupCount = 0;
+
+/* 语言切换后需要重绘的动态文本（applyI18n 已处理静态 data-i18n 元素） */
+function refreshDynamicTexts() {
+  if (neuronCount) {
+    document.getElementById('tagline').textContent = t('tagline', {
+      count: neuronCount.toLocaleString(), dataset: t(DS.labelKey), dsName,
+    });
+  }
+  if (groupCount) {
+    document.getElementById('brain-groups-label').textContent =
+      t('brain.legend', { count: groupCount });
+  }
+  if (game) ui.setLightButton(game.light);
+}
 
 async function boot() {
+  applyI18n();   // 静态 data-i18n 元素按当前语言渲染
   ui = new UI({
     onBanana: () => game && game.placeBanana(),
     onPoke: doPoke,
@@ -63,21 +81,28 @@ async function boot() {
     },
     onGain: (v) => { if (game) game.inputGain = v; },
   });
-  ui.setLoadingText(`下载连接组二进制（${DS.label}）…`);
+
+  // 语言切换按钮（EN/中）：i18n 内部已刷新静态元素，这里补动态文本
+  document.getElementById('btn-lang').onclick = () => {
+    toggleLang();
+    refreshDynamicTexts();
+  };
+
+  ui.setLoadingText(t('loading.connectome', { dataset: t(DS.labelKey) }));
 
   try {
     const [connResp, metaResp] = await Promise.all([
       fetch(DS.connectome),
       fetch(DS.meta),
     ]);
-    if (!connResp.ok) throw new Error(`${DS.connectome} 下载失败：HTTP ${connResp.status}`);
-    if (!metaResp.ok) throw new Error(`${DS.meta} 下载失败：HTTP ${metaResp.status}`);
+    if (!connResp.ok) throw new Error(`${DS.connectome} HTTP ${connResp.status}`);
+    if (!metaResp.ok) throw new Error(`${DS.meta} HTTP ${metaResp.status}`);
     const buffer = await connResp.arrayBuffer();
     const meta = await metaResp.json();
 
-    ui.setLoadingText(`启动仿真 Worker，解析 ${(meta.edge_count / 1e6).toFixed(1)}M 条突触连接…`);
+    ui.setLoadingText(t('loading.worker', { edges: (meta.edge_count / 1e6).toFixed(1) }));
     worker = new Worker('src/sim-worker.js', { type: 'module' });
-    worker.onerror = (e) => ui.showError(`Worker 错误：${e.message}`);
+    worker.onerror = (e) => ui.showError(t('error.worker', { msg: e.message }));
 
     const ready = await new Promise((resolve, reject) => {
       worker.onmessage = (e) => {
@@ -87,14 +112,12 @@ async function boot() {
       worker.postMessage({ type: 'init', buffer, targetInput: DS.targetInput }, [buffer]);
     });
 
-    // HUD 标题注明数据集与神经元数
-    document.getElementById('tagline').textContent =
-      `${ready.neuronCount.toLocaleString()} 个真实连接组神经元（${DS.label}）正在驱动这只果蝇 · ` +
-      `Eon 的闭环没开源，我们做一个浏览器里能跑的开源版 · 数据集：${dsName}`;
-    document.getElementById('brain-groups-label').textContent =
-      `${meta.group_count} 功能组 · 蓝=感觉 紫=中枢 橙=驱动 绿=运动`;
+    // HUD 标题注明数据集与神经元数（双语模板，语言切换时重渲染）
+    neuronCount = ready.neuronCount;
+    groupCount = meta.group_count;
+    refreshDynamicTexts();
 
-    ui.setLoadingText('加载神经元池…');
+    ui.setLoadingText(t('loading.pools'));
     pools = await Pools.load(DS.pools, ready.neuronCount, DS.keys);
 
     // 运行时按组选取的刺激池（数据集无对应组则为 null，game.js 已做守卫）
@@ -131,7 +154,7 @@ async function boot() {
       } else if (d.type === 'stats') {
         latestStats = d;
       } else if (d.type === 'error') {
-        ui.showError(`仿真错误：${d.message}`);
+        ui.showError(t('error.sim', { msg: d.message }));
       }
     };
     worker.postMessage({ type: 'start' });
@@ -139,7 +162,7 @@ async function boot() {
     ui.hideLoading();
     requestAnimationFrame(frame);
   } catch (err) {
-    ui.showError(`初始化失败：${err.message}。请确认通过本地服务器访问（见 README）。`);
+    ui.showError(t('error.initFailed', { msg: err.message }));
   }
 }
 

@@ -1,3 +1,28 @@
+# Banana Quest & the Digital Fruit Fly Knowledge Base
+
+[English](#english) · [中文](#中文)
+
+---
+
+<a id="english"></a>
+## English
+
+A zero-dependency **browser game driven by real whole-brain connectomes** (a leaky integrate-and-fire network over 139k–176k neurons), a peer-reviewed-style **technical note on data-packaging pitfalls in connectome simulation**, and a **Chinese knowledge base** on fly connectomics and whole-brain emulation (WBE).
+
+- **Play**: https://professorwang.github.io/flybrain-banana-quest/ (add `?dataset=malecns` for the MaleCNS mode with VNC and real motor neurons; add `?lang=en` for English UI)
+- **Technical note v6.0**: [game/docs/TECH-NOTE.md](game/docs/TECH-NOTE.md) ([PDF](game/docs/TECH-NOTE.pdf), 8 pp) · LaTeX: [game/docs/arxiv/main.tex](game/docs/arxiv/main.tex) — *Packaging choices change connectome-simulation outcomes: transmitter sign tables, matched controls, and weight-scheme dependence in two fly connectomes*
+- **In one sentence**: two community connectome packages sign glutamate oppositely, and that single packaging rule can flip a whole-brain high-activity regime — but matched controls show the effect is driven by synaptic-mass balance, not by glutamate itself, and a second weight scheme removes the apparent specificity. Every number regenerates from frozen scripts (`game/tools/probe_*.mjs`).
+- **Quick start**: `cd game && python -m http.server 8000` → http://localhost:8000 · regression: `node game/test/sim.test.mjs` · closed loop: `node game/tools/headless_run.mjs 120`
+- **Licenses**: code MIT (© 2026 Yang Wang) · FlyWire data CC BY-NC 4.0 (non-commercial) · MaleCNS data CC BY 4.0
+- **Review note**: the multi-round "reviews" documented in `game/docs/REVIEW-RESPONSE.md` are AI-assisted technical reviews with scripted re-verification, not formal peer review.
+
+![gameplay](game/docs/img/overview.png)
+
+---
+
+<a id="中文"></a>
+## 中文
+
 # 电子果蝇知识库（Digital Fruit Fly Knowledge Base）
 
 > 来源：基于 2026-09-17 调研整理

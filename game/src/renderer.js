@@ -1,5 +1,6 @@
 /* renderer.js —— Canvas 2D 竞技场渲染：俯视沙盒、果蝇精灵、香蕉、嗅觉梯度。 */
 import { ARENA } from './game.js';
+import { t } from './i18n.js';
 
 export class Renderer {
   constructor(canvas) {
@@ -68,24 +69,24 @@ export class Renderer {
       ctx.stroke();
     }
 
-    // 状态标签
+    // 状态标签（文案走 i18n，随当前语言切换）
     ctx.font = '12px "Microsoft YaHei", sans-serif';
     if (game.standby && !game.feeding) {
       ctx.fillStyle = 'rgba(200, 200, 200, 0.75)';
-      ctx.fillText('待机噪声（随机游走，非脑驱动）', game.fly.x + 14, game.fly.y - 14);
+      ctx.fillText(t('canvas.standby'), game.fly.x + 14, game.fly.y - 14);
     }
     if (game.feeding) {
       ctx.fillStyle = '#7ee787';
-      ctx.fillText('味觉刺激中…等待脑进食指令', game.fly.x + 14, game.fly.y - 14);
+      ctx.fillText(t('canvas.feeding'), game.fly.x + 14, game.fly.y - 14);
     }
     if (game.eatAnim > 0) {
       ctx.fillStyle = '#ffd640';
       ctx.font = 'bold 14px "Microsoft YaHei", sans-serif';
-      ctx.fillText('进食！+1', game.fly.x + 14, game.fly.y - 16);
+      ctx.fillText(t('canvas.eat'), game.fly.x + 14, game.fly.y - 16);
     }
     if (game.escaping > 0) {
       ctx.fillStyle = '#ff7878';
-      ctx.fillText('逃离！', game.fly.x + 14, game.fly.y - 14);
+      ctx.fillText(t('canvas.escaping'), game.fly.x + 14, game.fly.y - 14);
     }
     if (game.windTimer > 0) {
       ctx.fillStyle = 'rgba(150, 200, 255, 0.8)';

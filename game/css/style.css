@@ -226,3 +226,14 @@ footer a { color: #4fc3f7; }
   #raster-canvas { height: 170px; }
   #honesty ul { font-size: 13px; }
 }
+
+
+/* 语言切换按钮（右上角） */
+header { position: relative; }
+#btn-lang {
+  position: absolute;
+  right: 20px;
+  top: 14px;
+  padding: 4px 10px;
+  font-size: 12px;
+}

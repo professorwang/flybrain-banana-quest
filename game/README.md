@@ -1,5 +1,24 @@
 # 电子果蝇·香蕉大作战（Digital Fruit Fly: Banana Quest）
 
+[English](#english) · [中文](#中文)
+
+<a id="english"></a>
+## English
+
+A 2D browser foraging game driven by a leaky integrate-and-fire network over **real whole-brain connectomes**: FlyWire FAFB v783 (139,255 neurons / 2,698,236 aggregated connections) by default, or MaleCNS v1.0 (176,422 neurons, **with the ventral nerve cord and real motor-neuron pools**) via `?dataset=malecns`. There is no hand-crafted behavior layer between the network and the readouts: odor input goes into left/right antennal ORN pools, spikes propagate through the real wiring to descending neurons, and their pooled firing steers the fly; feeding is gated by a SEZ + proboscis motor readout. (The game layer adds explicit kinematic rules — documented honestly in the note.)
+
+- **Play**: https://professorwang.github.io/flybrain-banana-quest/ · English UI: add `?lang=en` · MaleCNS: add `?dataset=malecns`
+- **Run locally**: `python -m http.server 8000` in this directory → http://localhost:8000 (ES-module/worker same-origin rules require a server)
+- **Zero dependencies, zero build**: vanilla ES modules + Canvas 2D + Web Worker
+- **Honesty**: what is real (connectome topology), what is simplified (LIF point neurons, L1 normalization, hand-picked sensory/motor pools, no VNC in the FlyWire dataset), and why a moving fly alone proves no biological fidelity — see the in-app panel and the sections below
+- **Technical note**: [docs/TECH-NOTE.md](docs/TECH-NOTE.md) — packaging choices (transmitter sign tables, normalization) measurably change connectome-simulation outcomes; matched controls + a second weight scheme included; every number regenerates from frozen scripts in `tools/`
+- **Licenses**: code MIT (© 2026 Yang Wang); FlyWire data CC BY-NC 4.0 (non-commercial); MaleCNS data CC BY 4.0 — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+
+---
+
+<a id="中文"></a>
+## 中文
+
 一只由**真实果蝇全脑连接组**（FlyWire FAFB v783：139,255 个神经元 / 2,698,236 条聚合
 突触连接）上的 LIF 脉冲网络驱动的果蝇，在 2D 沙盒里靠嗅觉找香蕉吃。
 

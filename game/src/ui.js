@@ -1,4 +1,6 @@
-/* ui.js —— HUD、参数滑块、按钮与科学诚实面板的状态管理。DOM 结构见 index.html。 */
+/* ui.js —— HUD、参数滑块、按钮与科学诚实面板的状态管理。DOM 结构见 index.html。
+ * 动态文案统一从 i18n 取（静态标签由 index.html 的 data-i18n 属性承担）。 */
+import { t } from './i18n.js';
 
 export class UI {
   /**
@@ -60,7 +62,7 @@ export class UI {
   }
 
   setLightButton(light) {
-    this.el.btnLight.textContent = light ? '关灯（黑暗）' : '开灯（光照）';
+    this.el.btnLight.textContent = light ? t('btn.lightToDark') : t('btn.lightToLight');
   }
 
   /* 每渲染帧刷新 HUD */
@@ -71,11 +73,11 @@ export class UI {
     e.score.textContent = String(game.score);
 
     let status;
-    if (game.escaping > 0) status = '逃离（脑对惊吓的响应）';
-    else if (game.eatAnim > 0) status = '进食！';
-    else if (game.feeding) status = '味觉刺激中，等待进食指令…';
-    else if (game.standby) status = '待机噪声（随机游走）';
-    else status = '脑驱动觅食中';
+    if (game.escaping > 0) status = t('status.escaping');
+    else if (game.eatAnim > 0) status = t('status.eat');
+    else if (game.feeding) status = t('status.feeding');
+    else if (game.standby) status = t('status.standby');
+    else status = t('status.forage');
     e.status.textContent = status;
 
     if (stats) {
