@@ -14,6 +14,8 @@ export const REGION_COLORS = {
 export const REGION_NAMES = { 0: '感觉', 1: '中枢', 2: '驱动', 3: '运动' };
 const REGION_CODE = { sensory: 0, central: 1, drives: 2, motor: 3 };
 
+import { getLang } from './i18n.js';
+
 // raster 中标注名称的重点组
 const LABEL_GROUPS = new Set([0, 2, 6, 8, 9, 17, 29, 32, 35, 37, 56]);
 
@@ -125,11 +127,14 @@ export class BrainView {
         ? REGION_COLORS[region] : 'rgba(120,120,120,0.15)';
       ctx.fillRect(g * bw + 0.5, H - 12 - h, Math.max(1, bw - 1.5), h);
     }
-    // 重点组标签（简写）
+    // 重点组标签（简写，随语言切换；组名与区域名本体保持英文原样）
     ctx.fillStyle = 'rgba(230,230,230,0.85)';
     ctx.font = `${Math.max(9, 9 * (window.devicePixelRatio || 1))}px sans-serif`;
-    const SHORT = { 0: 'R1-6', 2: 'ME', 6: '嗅食', 8: 'LN', 9: 'PN', 17: 'KC',
-                    29: '食', 32: '甜味', 35: 'DESC', 37: '饿', 56: '喙' };
+    const SHORT = getLang() === 'en'
+      ? { 0: 'R1-6', 2: 'ME', 6: 'food ORN', 8: 'LN', 9: 'PN', 17: 'KC',
+          29: 'feed', 32: 'sweet', 35: 'DESC', 37: 'hunger', 56: 'prob.' }
+      : { 0: 'R1-6', 2: 'ME', 6: '嗅食', 8: 'LN', 9: 'PN', 17: 'KC',
+          29: '食', 32: '甜味', 35: 'DESC', 37: '饿', 56: '喙' };
     for (const [gid, label] of Object.entries(SHORT)) {
       const g = Number(gid);
       if (this.meta.group_sizes[g] > 0) ctx.fillText(label, g * bw + 1, H - 2);

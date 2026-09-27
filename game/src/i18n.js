@@ -131,6 +131,8 @@ const STRINGS = {
 let current = detect();
 
 function detect() {
+  // 浏览器外（Node 工具链/测试 import 本模块计数或复用表时）无 location/localStorage
+  if (typeof location === 'undefined' || typeof localStorage === 'undefined') return 'zh';
   const q = new URLSearchParams(location.search).get('lang');
   if (q === 'en' || q === 'zh') return q;
   const saved = localStorage.getItem('efly-lang');
