@@ -4,8 +4,10 @@ message: "If you use this software or its technical notes, please cite it as bel
 type: software
 authors:
   - family-names: Wang
-    given-names: Professor
+    given-names: Yang
     alias: professorwang
+    affiliation: "Independent Researcher"
+    email: wangglenwang@gmail.com
 repository-code: "https://github.com/professorwang/flybrain-banana-quest"
 url: "https://professorwang.github.io/flybrain-banana-quest/"
 license: MIT
