@@ -9,6 +9,8 @@
 
 A zero-dependency **browser game driven by real whole-brain connectomes** (a leaky integrate-and-fire network over 139k–176k neurons), a peer-reviewed-style **technical note on data-packaging pitfalls in connectome simulation**, and a **Chinese knowledge base** on fly connectomics and whole-brain emulation (WBE).
 
+[![DOI (paper)](https://zenodo.org/badge/DOI/10.5281/zenodo.22998484.svg)](https://doi.org/10.5281/zenodo.22998484) [![DOI (code, all versions)](https://zenodo.org/badge/DOI/10.5281/zenodo.22998833.svg)](https://doi.org/10.5281/zenodo.22998833)
+
 - **Play**: https://professorwang.github.io/flybrain-banana-quest/ (add `?dataset=malecns` for the MaleCNS mode with VNC and real motor neurons; add `?lang=en` for English UI)
 - **Technical note v6.0**: [game/docs/TECH-NOTE.md](game/docs/TECH-NOTE.md) ([PDF](game/docs/TECH-NOTE.pdf), 8 pp) · LaTeX: [game/docs/arxiv/main.tex](game/docs/arxiv/main.tex) — *Packaging choices change connectome-simulation outcomes: transmitter sign tables, matched controls, and weight-scheme dependence in two fly connectomes*
 - **In one sentence**: two community connectome packages sign glutamate oppositely, and that single packaging rule can flip a whole-brain high-activity regime — but matched controls show the effect is driven by synaptic-mass balance, not by glutamate itself, and a second weight scheme removes the apparent specificity. Every number regenerates from frozen scripts (`game/tools/probe_*.mjs`).
