@@ -24,6 +24,11 @@ export const DEFAULTS = {
                            // 下行神经元，3.0 全链路可通且无癫痫式饱和，4.0 则全脑点燃
                            // ——见 README 调参记录）
   normalization: 'per-neuron', // 'per-neuron'（默认，可真实传播）| 'global-max'（参考实现原样）
+                           // | 'linear'（每突触固定系数，见 synScale）
+  synScale: 0.01,          // linear 模式：每个突触的权重（阈值单位）。按 1 tick≈1 ms 解读、
+                           // 匹配 Shiu et al. 参数（w_syn=0.275 mV、τ_syn=5 ms、τ_m=20 ms、
+                           // 阈-静息差 7 mV）的时间积分 PSP 约为 0.010，峰值匹配约 0.006
+                           // ——仅作量级参照，本内核不是 Shiu 模型（见 probe_linear.mjs）
   tickRate: 10,            // 默认 tick 频率（Hz）
   cooldownTicks: 20,       // 组休眠前的冷却 tick 数
 };
@@ -76,8 +81,13 @@ export class LIFSim {
     // per-neuron 归一化目标可实例级覆盖（MaleCNS 需要 4.0 才能驱动下行神经元，
     // 见 docs/malecns-probes.md）；不传则用 DEFAULTS.targetInput
     sim.targetInput = opts.targetInput !== undefined ? opts.targetInput : DEFAULTS.targetInput;
+    sim.synScale = opts.synScale !== undefined ? opts.synScale : DEFAULTS.synScale;
+    // alwaysActive：关闭组休眠门控（全部组每 tick 更新、从不清零残余电压），
+    // 用于检验这一性能优化是否改变动力学结论
+    sim.alwaysActive = !!opts.alwaysActive;
     sim._parse(raw);
     sim._buildGroupStructures();
+    if (sim.alwaysActive) sim.groupActive.fill(1);
     return sim;
   }
 
@@ -115,11 +125,16 @@ export class LIFSim {
       const aw = w < 0 ? -w : w;
       if (aw > maxAbsW) maxAbsW = aw;
     }
+    this.maxAbsW = maxAbsW;
     if (this.normalization === 'global-max') {
       if (maxAbsW > 0) {
         const s = DEFAULTS.weightScale / maxAbsW;
         for (let e = 0; e < E; e++) this.values[e] *= s;
       }
+    } else if (this.normalization === 'linear') {
+      // 每突触固定系数：w = 带符号突触计数 × synScale，不做逐神经元归一化
+      const s = this.synScale;
+      for (let e = 0; e < E; e++) this.values[e] *= s;
     } else {
       const sumIn = new Float64Array(N);
       for (let e = 0; e < E; e++) {
@@ -251,7 +266,7 @@ export class LIFSim {
     this.refractory.fill(0);
     this.sustainedIndices = null;
     this.sustainedIntensities = null;
-    this.groupActive.fill(0);
+    this.groupActive.fill(this.alwaysActive ? 1 : 0);
     this.groupCooldown.fill(0);
     this.tickCount = 0;
     this.activeNeuronCount = 0;
@@ -271,7 +286,8 @@ export class LIFSim {
     const cd = DEFAULTS.cooldownTicks;
     let firedCount = 0;
     const firedBuf = this._firedBuffer;
-    const groupSpikeCounts = new Uint16Array(numGroups);
+    // Uint32：视叶组有 8–9 万神经元，Uint16 在单 tick 同步放电 >65,535 时会静默回绕
+    const groupSpikeCounts = new Uint32Array(numGroups);
 
     groupRecvInput.fill(0);
     groupFiredThisTick.fill(0);
@@ -350,7 +366,7 @@ export class LIFSim {
 
     // 休眠判定：无放电、无输入、无刺激的组冷却归零后关闭并清空残余状态
     for (let g = 0; g < numGroups; g++) {
-      if (!groupActive[g]) continue;
+      if (!groupActive[g] || this.alwaysActive) continue;
       if (groupFiredThisTick[g] || groupRecvInput[g] || groupStimulatedThisTick[g]) {
         groupCooldown[g] = cd;
       } else if (--groupCooldown[g] <= 0) {

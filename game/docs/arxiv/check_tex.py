@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""check_tex.py —— main.tex 静态自查（无 LaTeX 编译器环境的替代验证）。"""
+"""check_tex.py —— main.tex 静态自查（无 LaTeX 编译器环境的替代验证）。
+
+v6 起新增 5–7 项：占位符残留、arXiv 摘要长度上限、参考文献引用完整性——
+这三类问题都曾在"已定稿"版本里漏检过。"""
 import re
 from collections import Counter
 
@@ -62,5 +65,35 @@ for m in re.finditer(r'\\begin\{tabular\}\{((?:[^{}]|\{[^}]*\})*)\}(.*?)\\end\{t
             bad4 += 1
 print('   OK 全部一致' if bad4 == 0 else f'   BAD {bad4} 处')
 
+print('5) 占位符/待办残留（placeholder / replace with / TODO / TBD / XXX）:')
+bad5 = 0
+for i, l in enumerate(lines, 1):
+    if l.lstrip().startswith('%'):
+        continue
+    if re.search(r'placeholder|replace with|\bTODO\b|\bTBD\b|XXX|@@', l, re.I):
+        print(f'   BAD 行 {i}: {l.strip()[:80]}'); bad5 += 1
+print('   OK 无残留' if bad5 == 0 else f'   BAD {bad5} 处')
+
+print('6) 英文摘要长度（arXiv 元数据表单上限 1920 字符）:')
+m = re.search(r'\\begin\{abstract\}(.*?)\\end\{abstract\}', src, re.S)
+a = m.group(1) if m else ''
+a = re.sub(r'\\(textbf|emph|texttt)\{', '', a).replace('}', '').replace(r'\noindent', '')
+for k, v in [(r'$\ge$', '>='), (r'$\to$', '->'), (r'$\sim$', '~'), (r'$\times$', 'x'),
+             (r'\%', '%'), (r'\_', '_'), ('---', '--'), ('$', '')]:
+    a = a.replace(k, v)
+a = re.sub(r'\s+', ' ', a).strip()
+ok6 = 0 < len(a) <= 1920
+print(f'   {"OK " if ok6 else "BAD"} {len(a)} 字符')
+
+print('7) 参考文献引用完整性（每条 bibitem 被引用、每个 cite 有条目）:')
+items = re.findall(r'\\bibitem\{([^}]+)\}', src)
+cited = set()
+for g in re.findall(r'\\cite[pt]?\{([^}]+)\}', src):
+    cited.update(k.strip() for k in g.split(','))
+unc = [k for k in items if k not in cited]
+dangling = sorted(cited - set(items))
+ok7 = not unc and not dangling
+print(f'   {"OK " if ok7 else "BAD"} 条目 {len(items)}，被引 {len(cited)}；未被引用 {unc}；无条目的 cite {dangling}')
+
 print()
-print('汇总:', 'PASS' if (ok1 and bad2 == 0 and bad3 == 0 and bad4 == 0) else 'FAIL')
+print('汇总:', 'PASS' if (ok1 and bad2 == 0 and bad3 == 0 and bad4 == 0 and bad5 == 0 and ok6 and ok7) else 'FAIL')

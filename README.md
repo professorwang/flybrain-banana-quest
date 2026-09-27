@@ -69,5 +69,7 @@ node game/tools/headless_run.mjs 120    # 无头闭环验证（应能吃到香�
 ![游戏实拍](game/docs/img/overview.png)
 
 玩法、架构、科学诚实声明（哪些是真实连接组、哪些是简化与人工选取）见
-[game/README.md](game/README.md)；数据与代码许可见
-[game/THIRD_PARTY_NOTICES.md](game/THIRD_PARTY_NOTICES.md)。
+[game/README.md](game/README.md)；代码许可见 [LICENSE](LICENSE)（MIT，仅代码），
+数据许可与引用要求见 [game/THIRD_PARTY_NOTICES.md](game/THIRD_PARTY_NOTICES.md)
+（FlyWire 数据 CC BY-NC 4.0，仅限非商业；MaleCNS 数据 CC BY 4.0）。技术报告 v6.0：
+[game/docs/TECH-NOTE.md](game/docs/TECH-NOTE.md)。

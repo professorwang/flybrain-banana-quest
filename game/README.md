@@ -100,10 +100,14 @@ game/
 │   ├── probe_malecns.mjs   MaleCNS 跨数据集探针（TECH-NOTE 三发现复测）
 │   ├── harness.mjs         无头闭环共享库（loadWorld / runEpisode / LCG 种子）
 │   ├── headless_run.mjs    无头闭环验证（可选配置覆盖 JSON 与种子参数）
-│   └── tune_sweep.mjs      游戏层参数网格扫参
+│   ├── tune_sweep.mjs      游戏层参数网格扫参
+│   ├── export_sign_tables.py  对照实验中间表（按递质拆分的 FlyWire 对表 + MaleCNS 逐神经元递质）
+│   ├── variants.mjs        对照实验共享库（内存中按神经元×递质重新赋号，含逐字节等价自检）
+│   ├── probe_controls.mjs  E0 自检/门控检验、E1 匹配对照、E1b 等质量身份检验、E2 剂量-反应
+│   └── probe_linear.mjs    E3 每突触固定系数方案扫描 + E3b 其下的匹配对照
 ├── docs/
-│   ├── TECH-NOTE.md        英文技术报告：归一化失败、结构偏置与调参教训
-│   └── malecns-probes.md   MaleCNS 复测数据（技术报告素材；解读以 TECH-NOTE v3 为准）
+│   ├── TECH-NOTE.md        英文技术报告 v6.0：数据加工选择（符号表/归一化/读出池/种子）如何改变仿真结论
+│   └── malecns-probes.md   MaleCNS 复测数据（技术报告素材；解读以 TECH-NOTE 最新版为准）
 └── test/sim.test.mjs       Node 烟雾测试
 ```
 

@@ -79,8 +79,9 @@ https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
 动力学模型的科学参照：
 
-- Shiu, P. K., Sterne, G. R., Engert, F., et al. (2024). A Drosophila
-  computational brain model reveals sensorimotor processing. *Nature*.
+- Shiu, P. K., Sterne, G. R., Spiller, N., et al. (2024). A Drosophila
+  computational brain model reveals sensorimotor processing. *Nature*, 634,
+  210–219. https://doi.org/10.1038/s41586-024-07763-9
   （官方代码用每突触固定系数 w_syn=0.275·mV 的全局权重方案；本项目采用的
   postsynaptic L1 归一化与之不同，为项目自选的工程方案——早期版本曾误将
   后者归于 Shiu 模型，已更正。）

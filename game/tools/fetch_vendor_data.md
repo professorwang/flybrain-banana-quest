@@ -55,6 +55,11 @@ python game/tools/flyb_to_bin.py
 # 符号变体（符号实验用，可不建）
 python game/tools/flyb_to_bin.py --glut-excitatory   # MaleCNS glut 兴奋版
 python game/tools/build_flywire_variant.py           # FlyWire glut 抑制版（含等价性自检）
+
+# 对照实验中间表（v6 新增：按递质拆分的 FlyWire 对表 + MaleCNS 逐神经元递质，
+# 写入 game/data/derived/，已 .gitignore；probe_controls/probe_linear 依赖它，
+# 并在运行时与上面两个符号变体逐字节核对）
+python game/tools/export_sign_tables.py
 ```
 
 重建后即可运行全部探针与测试：
@@ -65,4 +70,6 @@ node game/tools/probe_flywire.mjs
 node game/tools/probe_malecns.mjs
 node game/tools/probe_gain.mjs
 node game/tools/probe_signflip.mjs
+node game/tools/probe_controls.mjs   # E0 自检/门控检验 + E1 匹配对照 + E2 剂量-反应
+node game/tools/probe_linear.mjs     # E3 每突触固定系数方案 + E3b 其下的匹配对照
 ```
