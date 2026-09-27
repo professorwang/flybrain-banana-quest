@@ -151,7 +151,7 @@ The review-driven corrections, in order, each with its disposition. Full point-b
 
 ## Author contributions and AI-use disclosure
 
-**Author**: Yang Wang (Independent Researcher; contact: wangglenwang@gmail.com; GitHub: professorwang). The human author directed the project, chose the research questions, reviewed intermediate and final artifacts, ran independent verification of key results, and takes responsibility for all content.
+**Author**: Yang Wang (Fortune AI; contact: wangglenwang@gmail.com; GitHub: professorwang). The human author directed the project, chose the research questions, reviewed intermediate and final artifacts, ran independent verification of key results, and takes responsibility for all content.
 
 **AI use (per arXiv policy on generative AI language tools)**: an AI coding assistant (Kimi Code) wrote most of the simulation/game code and drafted this note and the review-response letter under human direction; AI systems (Codex and Claude) performed multi-round technical review of the manuscripts, including independent re-runs of the probe battery that we cross-checked against our own runs (their re-derived numbers matched ours in every case reported in the response letter). No AI system is listed as an author; every AI-generated number quoted in this note was re-derived by our own frozen scripts before inclusion. **Review-identity note**: the "reviews" documented in the correction history and the response letter are AI-assisted technical reviews with scripted re-verification — they are not independent laboratory validation and not formal peer review; arXiv moderation itself is also not peer review.
 
