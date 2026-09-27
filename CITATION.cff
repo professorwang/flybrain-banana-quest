@@ -11,7 +11,7 @@ authors:
 repository-code: "https://github.com/professorwang/flybrain-banana-quest"
 url: "https://professorwang.github.io/flybrain-banana-quest/"
 license: MIT
-version: "0.6.0"
+version: "0.6.1"
 date-released: "2026-09-27"
 notes: "Code MIT (see LICENSE). Data: FlyWire FAFB v783 CC BY-NC 4.0 (non-commercial); MaleCNS v1.0 CC BY 4.0; see game/THIRD_PARTY_NOTICES.md."
 keywords:
@@ -30,5 +30,6 @@ preferred-citation:
       affiliation: "Fortune AI"
   year: 2026
   month: 9
-  notes: "Technical note v6.0 (game/docs/TECH-NOTE.md; LaTeX source game/docs/arxiv/main.tex)."
+  notes: "Technical note v6.0.1 (game/docs/TECH-NOTE.md; LaTeX source game/docs/arxiv/main.tex)."
+  doi: "10.5281/zenodo.22998484"
   url: "https://github.com/professorwang/flybrain-banana-quest"

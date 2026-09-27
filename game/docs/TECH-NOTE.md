@@ -1,6 +1,6 @@
 # Packaging choices change connectome-simulation outcomes: transmitter sign tables, matched controls, and weight-scheme dependence in two fly connectomes
 
-**Technical note v6.0, 2026-09-27. Yang Wang (Fortune AI; wangglenwang@gmail.com). Code, data and frozen scripts: https://github.com/professorwang/flybrain-banana-quest (code MIT; FlyWire FAFB v783 data CC BY-NC 4.0; MaleCNS v1.0 data CC BY 4.0); this version is archived as repository release `v0.6.0`. v6.0 adds matched controls, an equal-mass identity test, dose-response and a second weight scheme (§3.2–3.5); they withdraw the "sufficient and necessary" framing of v5.1 (revision history: end of §7). LaTeX source: `docs/arxiv/main.tex`.**
+**Technical note v6.0.1, 2026-09-27. Yang Wang (Fortune AI; wangglenwang@gmail.com). Code, data and frozen scripts: https://github.com/professorwang/flybrain-banana-quest (code MIT; FlyWire FAFB v783 data CC BY-NC 4.0; MaleCNS v1.0 data CC BY 4.0); this version is archived as repository release `v0.6.1`, and this note itself is archived at Zenodo: https://doi.org/10.5281/zenodo.22998484. v6.0 adds matched controls, an equal-mass identity test, dose-response and a second weight scheme (§3.2–3.5); they withdraw the "sufficient and necessary" framing of v5.1 (revision history: end of §7). LaTeX source: `docs/arxiv/main.tex`.**
 
 ## 中文摘要
 
@@ -165,7 +165,7 @@ Open questions: (1) repeat the sign-rule audit in Shiu et al.'s own model or fly
 
 ## 7. Reproducibility
 
-All numbers were produced on this repository (Node v24, Python 3.13, Windows; CPU only; each script runs in minutes). Vendor data acquisition with pinned commits and SHA-256 checksums: `game/tools/fetch_vendor_data.md`. Per-run outputs are archived under `game/docs/results/` with the producing command in each file's header; timing fields fluctuate with load, spike counts are bit-stable. Commit lineage: v1 @ `d92807b`; v2 @ `73da541`; v3–v4 @ `63c54ca` / `709b188`; v4.1 @ `80a4768`; v5–v5.1 @ `5fc44b0` / `4811635`; v6.0 = release `v0.6.0`.
+All numbers were produced on this repository (Node v24, Python 3.13, Windows; CPU only; each script runs in minutes). Vendor data acquisition with pinned commits and SHA-256 checksums: `game/tools/fetch_vendor_data.md`. Per-run outputs are archived under `game/docs/results/` with the producing command in each file's header; timing fields fluctuate with load, spike counts are bit-stable. Commit lineage: v1 @ `d92807b`; v2 @ `73da541`; v3–v4 @ `63c54ca` / `709b188`; v4.1 @ `80a4768`; v5–v5.1 @ `5fc44b0` / `4811635`; v6.0 = release `v0.6.0`; v6.0.1 = release `v0.6.1` (adds the Zenodo DOI). This note is archived at https://doi.org/10.5281/zenodo.22998484.
 
 | number(s) | command |
 |---|---|
