@@ -7,7 +7,9 @@
 
 A 2D browser foraging game driven by a leaky integrate-and-fire network over **real whole-brain connectomes**: FlyWire FAFB v783 (139,255 neurons / 2,698,236 aggregated connections) by default, or MaleCNS v1.0 (176,422 neurons, **with the ventral nerve cord and real motor-neuron pools**) via `?dataset=malecns`. There is no hand-crafted behavior layer between the network and the readouts: odor input goes into left/right antennal ORN pools, spikes propagate through the real wiring to descending neurons, and their pooled firing steers the fly; feeding is gated by a SEZ + proboscis motor readout. (The game layer adds explicit kinematic rules — documented honestly in the note.)
 
-- **Play**: https://professorwang.github.io/flybrain-banana-quest/ · English UI: add `?lang=en` · MaleCNS: add `?dataset=malecns`
+- **Play**: https://professorwang.github.io/flybrain-banana-quest/ · 3D hero view: add `?view=3d` · English UI: add `?lang=en` · MaleCNS: add `?dataset=malecns`
+
+![3D hero view: the brain-driven fly with the live whole-brain activity panel](docs/img/hero-3d.png)
 - **Run locally**: `python -m http.server 8000` in this directory → http://localhost:8000 (ES-module/worker same-origin rules require a server)
 - **Zero dependencies, zero build**: vanilla ES modules + Canvas 2D + Web Worker
 - **Honesty**: what is real (connectome topology), what is simplified (LIF point neurons, L1 normalization, hand-picked sensory/motor pools, no VNC in the FlyWire dataset), and why a moving fly alone proves no biological fidelity — see the in-app panel and the sections below

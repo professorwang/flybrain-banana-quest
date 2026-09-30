@@ -11,14 +11,16 @@ A zero-dependency **browser game driven by real whole-brain connectomes** (a lea
 
 [![DOI (paper)](https://zenodo.org/badge/DOI/10.5281/zenodo.22998484.svg)](https://doi.org/10.5281/zenodo.22998484) [![DOI (code, all versions)](https://zenodo.org/badge/DOI/10.5281/zenodo.22998833.svg)](https://doi.org/10.5281/zenodo.22998833)
 
-- **Play**: https://professorwang.github.io/flybrain-banana-quest/ (add `?dataset=malecns` for the MaleCNS mode with VNC and real motor neurons; add `?lang=en` for English UI)
+- **Play**: https://professorwang.github.io/flybrain-banana-quest/ (add `?view=3d` for the 3D hero view, `?lang=en` for English UI, `?dataset=malecns` for the MaleCNS mode with VNC and real motor neurons)
+
+![3D hero view: the brain-driven fly with the live whole-brain activity panel](game/docs/img/hero-3d.png)
 - **Technical note v6.0**: [game/docs/TECH-NOTE.md](game/docs/TECH-NOTE.md) ([PDF](game/docs/TECH-NOTE.pdf), 8 pp) · LaTeX: [game/docs/arxiv/main.tex](game/docs/arxiv/main.tex) — *Packaging choices change connectome-simulation outcomes: transmitter sign tables, matched controls, and weight-scheme dependence in two fly connectomes*
 - **In one sentence**: two community connectome packages sign glutamate oppositely, and that single packaging rule can flip a whole-brain high-activity regime — but matched controls show the effect is driven by synaptic-mass balance, not by glutamate itself, and a second weight scheme removes the apparent specificity. Every number regenerates from frozen scripts (`game/tools/probe_*.mjs`).
 - **Quick start**: `cd game && python -m http.server 8000` → http://localhost:8000 · regression: `node game/test/sim.test.mjs` · closed loop: `node game/tools/headless_run.mjs 120`
 - **Licenses**: code MIT (© 2026 Yang Wang) · FlyWire data CC BY-NC 4.0 (non-commercial) · MaleCNS data CC BY 4.0
 - **Review note**: the multi-round "reviews" documented in `game/docs/REVIEW-RESPONSE.md` are AI-assisted technical reviews with scripted re-verification, not formal peer review.
 
-![gameplay](game/docs/img/overview.png)
+![3D 英雄视角下的游戏实拍](game/docs/img/hero-3d.png)
 
 ---
 
@@ -93,7 +95,7 @@ node game/tools/headless_run.mjs 120    # 无头闭环验证（应能吃到香�
 **在线试玩**：https://professorwang.github.io/flybrain-banana-quest/ （GitHub Pages，仓库即
 [professorwang/flybrain-banana-quest](https://github.com/professorwang/flybrain-banana-quest)）
 
-![游戏实拍](game/docs/img/overview.png)
+![3D 英雄视角实拍](game/docs/img/hero-3d.png)
 
 玩法、架构、科学诚实声明（哪些是真实连接组、哪些是简化与人工选取）见
 [game/README.md](game/README.md)；代码许可见 [LICENSE](LICENSE)（MIT，仅代码），
