@@ -1,0 +1,15 @@
+# l1_lif 提交配置 —— MaleCNS 版（Banana Quest postsynaptic L1-normalized LIF）
+# 符号规则：fly-brain-minecraft（glut−、histamine−、GABA−、ACH+、单胺+）——
+# 与 flybench 构建符号（Shiu）唯一差异为 histamine，模型按 nt_csv 翻转之。
+v_rest_mv: -52.0
+v_reset_mv: -52.0
+v_th_mv: -45.0
+tau_m_ms: 20.0
+tau_syn_ms: 5.0
+t_ref_ms: 2.2
+delay_ms: 1.8
+dt_ms: 0.1
+extra:
+  target_input_mv: 84.0      # 扫描窗口：GF 50 Hz、loom 活跃率 0.0024、静默基线 0；taste 链在 ≤112 均不点燃
+  nt_csv: F:/claude/fruitfly/.flybench_data/data-malecns/neurons.csv.gz
+  sign_rule: minecraft

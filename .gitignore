@@ -35,3 +35,6 @@ game/data/derived/
 game/docs/arxiv/*.aux
 game/docs/arxiv/*.out
 game/docs/arxiv/*.log
+
+# flybench 数据缓存（运行时生成，222MB，可重建）
+.flybench_data/
