@@ -76,6 +76,30 @@ def export_flywire() -> None:
     REPORT.append(f"- FlyWire connections.csv.gz 总行数 {rows:,}（每行 = 神经元对 × 脑区）")
     REPORT.append("- 行级递质标签（行数 / 突触数）：" + "；".join(
         f"{k} {label_rows[k]:,} / {label_syn[k]:,}" for k, _ in label_rows.most_common()))
+    # 行级赋号 vs 神经元级赋号：snedea 包按连接行（神经元对×脑区）赋号，同一突触前神经元的
+    # 不同行可带不同符号；Shiu et al. 2024 按神经元投票赋号（每个神经元要么全兴奋要么全抑制）。
+    # 下面按"兴奋类 ACH/DA/SER/OCT vs 抑制类 GABA/GLUT 的突触数"量化包内的混合符号神经元。
+    # 注：这是按突触数的近似，Shiu 的规则是逐突触前位点的最高预测投票（cleft score ≥ 50）。
+    exc_syn = [0] * N
+    inh_syn = [0] * N
+    glut_syn = [0] * N
+    for (ia, _), rec in pairs.items():
+        exc_syn[ia] += rec[0] + rec[3] + rec[4] + rec[5]
+        inh_syn[ia] += rec[1] + rec[2]
+        glut_syn[ia] += rec[2]
+    out_n = sum(1 for i in range(N) if exc_syn[i] + inh_syn[i] > 0)
+    mixed = [i for i in range(N) if exc_syn[i] > 0 and inh_syn[i] > 0]
+    minority = sum(min(exc_syn[i], inh_syn[i]) for i in mixed)
+    total_syn = sum(exc_syn) + sum(inh_syn)
+    n10 = sum(1 for i in mixed if min(exc_syn[i], inh_syn[i]) / (exc_syn[i] + inh_syn[i]) >= 0.10)
+    n25 = sum(1 for i in mixed if min(exc_syn[i], inh_syn[i]) / (exc_syn[i] + inh_syn[i]) >= 0.25)
+    glut_n = sum(1 for i in range(N) if glut_syn[i] > 0)
+    glut_mixed = sum(1 for i in range(N) if glut_syn[i] > 0 and exc_syn[i] > 0)
+    REPORT.append(f"- 行级赋号下有输出的突触前神经元 {out_n:,}；同时拥有兴奋类与抑制类输出突触的 "
+                  f"{len(mixed):,}（{100 * len(mixed) / out_n:.1f}%）")
+    REPORT.append(f"- 与自身神经元多数符号相反的突触（少数侧）{minority:,} / {total_syn:,} = "
+                  f"{100 * minority / total_syn:.1f}%；少数侧占比 ≥10% 的神经元 {n10:,}，≥25% 的 {n25:,}")
+    REPORT.append(f"- 拥有 ≥1 条 GLUT 行的神经元 {glut_n:,}，其中同时有兴奋类输出的 {glut_mixed:,}")
     keys = sorted(pairs)
     P = len(keys)
     buf = bytearray(12 + P * 20)
