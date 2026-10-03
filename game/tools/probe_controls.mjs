@@ -261,6 +261,7 @@ for (const D of DS) {
   console.log(`| 1 | 1.00 | ${fmt(a4.total)} | ${fmt(a4.dn)} | ${fmt(a4.vis)} |\n`);
 }
 
-writeFileSync(join(DATA, '..', 'docs', 'results', 'controls_runs.csv'), csv.join('\n') + '\n');
+// CONTROLS_CSV_OUT：verify_results.mjs 用它把逐次结果写到临时文件，避免覆盖归档
+writeFileSync(process.env.CONTROLS_CSV_OUT || join(DATA, '..', 'docs', 'results', 'controls_runs.csv'), csv.join('\n') + '\n');
 console.log('逐次结果：game/docs/results/controls_runs.csv');
 console.log('\n探针完成。');

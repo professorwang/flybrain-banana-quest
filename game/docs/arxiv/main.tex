@@ -47,7 +47,7 @@ framing of v5.1; v6.1 adds Figure 1 and credits prior sign-sensitivity work
 
 %<PDFFRIENDLY-START> —— pdfLaTeX 备选：删除本段中文摘要即可
 \section*{中文摘要}
-本文追问：“在连接组上跑动力学”的仿真结论，有多少是由数据加工选择而非连接组本身决定的？我们用同一个 LIF 内核在两个社区封装的真实连接组（FlyWire FAFB v783：139,255 神经元；MaleCNS v1.0：176,422 神经元）上测量。两个包对谷氨酸的赋号相反（兴奋 vs 抑制），只翻转这一条规则就能双向切换一个全脑高活动态（FlyWire 视叶放电 405,788$\to$0；MaleCNS 2$\to$553,863）。v6 检验这一翻转到底隔离了什么：逐字节等价重建确认变体无误；质量匹配的随机对照（翻转其他递质类别、突触质量不超过谷氨酸规则）同样消除 FlyWire 的高活动态（405,788$\to$1--128），说明该效应在那里不是谷氨酸特异的；在逐组突触质量完全相同时，MaleCNS 的点燃只出现在谷氨酸翻转（279,054 vs 108）。剂量-反应陡峭且有阈值（翻转 25\% 的谷氨酸质量即去掉 FlyWire 98.7\% 的视叶活动；MaleCNS 在 75\%--90\% 之间点燃）。把本项目的 postsynaptic L1 归一化换成每突触固定系数后，符号效应方向不变（Shiu 匹配量级下 22--29 倍），但从全有全无变为梯度，MaleCNS 上谷氨酸的特异性也随之消失甚至反转。参考实现的全局 max 归一化之所以完全不传播，是因为其每突触权重比 Shiu 匹配量级低约 100--170 倍。结论：谷氨酸规则之所以重要，首先因为它是两个包分歧最大的一块突触质量；关于特定递质类别的论断需要质量匹配对照和第二种权重方案。全部结果是模型内的，不能推导真实果蝇生物学；每个数字都可由冻结脚本复现。
+本文追问：“在连接组上跑动力学”的仿真结论，有多少是由数据加工选择而非连接组本身决定的？我们用同一个 LIF 内核在两个社区封装的真实连接组（FlyWire FAFB v783：139,255 神经元；MaleCNS v1.0：176,422 神经元）上测量。两个包对谷氨酸的赋号相反（兴奋 vs 抑制），只翻转这一条规则就能双向切换一个全脑高活动态（FlyWire 视叶放电 405,788$\to$0；MaleCNS 2$\to$553,863）。Shiu 等人已在自己的模型里检验过符号敏感性；本文检验这一翻转到底隔离了什么：逐字节等价重建确认变体无误；质量匹配的随机对照（翻转其他递质类别、突触质量不超过谷氨酸规则）同样消除 FlyWire 的高活动态（405,788$\to$1--128），说明该效应在那里不是谷氨酸特异的；在逐组突触质量完全相同时，MaleCNS 的点燃只出现在谷氨酸翻转（279,054 vs 108）。剂量-反应陡峭且有阈值（翻转 25\% 的谷氨酸质量即去掉 FlyWire 98.7\% 的视叶活动；MaleCNS 在 75\%--90\% 之间点燃）。把本项目的 postsynaptic L1 归一化换成每突触固定系数后，符号效应方向不变（Shiu 匹配量级下 22--29 倍），但从全有全无变为梯度，MaleCNS 上谷氨酸的特异性也随之消失甚至反转。参考实现的全局 max 归一化之所以完全不传播，是因为其每突触权重比 Shiu 匹配量级低约 100--170 倍。结论：谷氨酸规则之所以重要，首先因为它是两个包分歧最大的一块突触质量；关于特定递质类别的论断需要质量匹配对照和第二种权重方案。全部结果是模型内的，不能推导真实果蝇生物学；每个数字都可由冻结脚本复现。
 %<PDFFRIENDLY-END>
 
 \begin{abstract}
@@ -57,8 +57,8 @@ leaky integrate-and-fire core on two community packages of real fly
 connectomes (FlyWire FAFB v783, 139,255 neurons; MaleCNS v1.0, 176,422
 neurons). The packages sign glutamate oppositely, and flipping that one rule
 switches a whole-brain high-activity regime in both directions (FlyWire
-visual-lobe spikes 405,788 $\to$ 0; MaleCNS 2 $\to$ 553,863). We then test
-what the flip isolates. Byte-identical rebuilds confirm the variants.
+visual-lobe spikes 405,788 $\to$ 0; MaleCNS 2 $\to$ 553,863). Shiu et al.\ had already shown sign
+sensitivity for their own model; we test what the flip isolates here. Byte-identical rebuilds confirm the variants.
 Mass-matched random flips of other transmitter classes also abolish the
 FlyWire regime (405,788 $\to$ 1--128), so there it is not glutamate-specific;
 at equal per-group synaptic mass, MaleCNS ignites only under glutamatergic
