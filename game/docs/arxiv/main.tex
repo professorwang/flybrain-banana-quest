@@ -12,6 +12,7 @@
 \setCJKsansfont{FandolHei-Regular.otf}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{booktabs}
+\usepackage{graphicx}
 \usepackage{array}
 \usepackage{xcolor}
 \usepackage{microtype}
@@ -25,22 +26,22 @@
 transmitter sign tables, matched controls, and weight-scheme\\
 dependence in two fly connectomes}
 \author{Yang Wang\thanks{Fortune AI. Contact: \href{mailto:wangglenwang@gmail.com}{wangglenwang@gmail.com}. GitHub: \url{https://github.com/professorwang}.}}
-\date{Technical note v6.0.1, 2026-09-27}
+\date{Technical note v6.1 (draft), 2026-10-03}
 
 \begin{document}
 \maketitle
 
 \begin{sloppypar}
 \noindent\small
-\textbf{Technical note v6.0.1, 2026-09-27.} Code, data and frozen scripts:
+\textbf{Technical note v6.1 (draft), 2026-10-03.} Code, data and frozen scripts:
 \ds{https://github.com/professorwang/flybrain-banana-quest} (code MIT; FlyWire
-FAFB v783 data CC BY-NC 4.0; MaleCNS v1.0 data CC BY 4.0); this version is
-archived as repository release \texttt{v0.6.1}, and this note itself is
-archived at Zenodo: \ds{https://doi.org/10.5281/zenodo.22998484}. Demo:
-\ds{https://professorwang.github.io/flybrain-banana-quest/}. v6.0 adds matched
-controls, an equal-mass identity test, dose-response and a second weight
-scheme (\S3.2--3.5); they withdraw the ``sufficient and necessary'' framing of
-v5.1 (revision history: end of \S7).
+FAFB v783 data CC BY-NC 4.0; MaleCNS v1.0 data CC BY 4.0). Earlier version
+v6.0.1 is archived at Zenodo: \ds{https://doi.org/10.5281/zenodo.22998484}.
+Demo: \ds{https://professorwang.github.io/flybrain-banana-quest/}. v6.0 added
+matched controls, an equal-mass identity test, dose-response and a second
+weight scheme (\S3.2--3.5), which withdraw the ``sufficient and necessary''
+framing of v5.1; v6.1 adds Figure 1 and credits prior sign-sensitivity work
+(revision history: end of \S7).
 \normalsize
 \end{sloppypar}
 
@@ -190,8 +191,22 @@ presynaptic neurons, although only 19,605 neurons are labeled glutamatergic
 overall. In MaleCNS, signs are set per presynaptic neuron: 29,763
 glutamatergic neurons ($-1$, 14,552,047 output synapses), 22,248 GABAergic and
 8,021 histaminergic. Shiu et al.\ likewise treat glutamate as
-inhibitory~\cite{shiu2024}. Other differences remain: sex, VNC
+inhibitory by default, while noting that glutamate can act either way in
+\emph{Drosophila}~\cite{shiu2024}. Other differences remain: sex, VNC
 (absent/present), individual, and packaging pipeline.
+
+\textbf{Row-level versus neuron-level sign assignment.} Shiu et al.\ assign one
+sign per neuron (a neuron is inhibitory if more than half of its presynaptic
+sites are predicted GABA or glutamate), so every neuron is exclusively
+excitatory or inhibitory~\cite{shiu2024}. The FlyWire package instead signs each
+connection row, so one neuron can drive targets with both signs: 39,703 of
+129,351 presynaptic neurons (30.7\%) have output synapses of both signs, and
+926,545 synapses (2.7\%) carry the sign opposite to their own neuron's majority
+(13,943 neurons have a minority share of at least 10\%). Of the 51,185 neurons
+with at least one GLUT row, 31,767 also have excitatory output rows. This
+count is by synapse number, not by per-site prediction, so it approximates
+rather than reproduces the Shiu rule; MaleCNS signs are per neuron by
+construction.
 
 \textbf{Same normalization structure, drifting working point.} Under L1
 normalization and olfactory drive (I = 1.0, 200 ticks) both datasets show
@@ -218,6 +233,26 @@ I = 1.0 for 200 ticks, and report total spikes, the descending group
 (FlyWire GNG\_DESC, MaleCNS DN) and the visual group (FlyWire VIS\_ME,
 82,318 neurons; MaleCNS VIS\_OL, 89,403 neurons). Runs are deterministic;
 randomness enters only through sampling seeds.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{fig1_controls.pdf}
+\caption{Glutamate-rule flips versus mass-matched non-glutamate controls,
+under two weight schemes. Each panel plots visual-group spikes in 200 ticks
+(symlog axis, shared) against the fraction of the full glutamate-rule synaptic
+mass that is flipped. \textbf{Blue}: glutamate units; the thin line and small
+dots are random fractions (E2, five seeds), the large circles are
+equal-mass pair partners (E1b, ten seeds in A--B; E3c, five seeds in C--D;
+median and range), and the circle at 1.0 is the full rule. \textbf{Orange}:
+matched non-glutamate controls with the same per-group mass (A--B: E1b, plus
+the capped C-match control near mass 0.9; C--D: E3c). \textbf{Gray}: package
+default. (A) FlyWire: any inhibitory block of this size suppresses the regime;
+glutamate rows are moderately more potent at equal mass. (B) MaleCNS under L1:
+ignition occurs only for glutamate flips. (C, D) With a fixed weight per
+synapse the effects are graded, and at mass 0.9 the MaleCNS control exceeds
+the glutamate flip. Source: \texttt{game/tools/make\_figure1.py}.}
+\label{fig:controls}
+\end{figure}
 
 \subsection{The bidirectional intervention (v5 result, re-verified)}
 
@@ -253,6 +288,18 @@ MaleCNS GLUT $+$ & 4 & 1,797,262 & 19,004 & \textbf{553,863} \\
 v5.1 read this as ``the glutamate sign assignment is sufficient and
 necessary''. That reading does not distinguish glutamate from \emph{any}
 comparable change in excitatory/inhibitory synaptic mass. \S3.2--3.5 test it.
+
+\textbf{Prior sensitivity analysis.} That the glutamate sign matters is not new
+for the Shiu et al.\ model: its Methods (``Assessment of model robustness to
+parameters and assumptions''; Supplementary Table 11f) repeat the analysis with
+glutamate excitatory and report that the inferred inhibition by bitter and
+Ir94e neurons disappears and that the false-positive rate of their
+optogenetic-activation test rises from 1\% to 16\%~\cite{shiu2024}. What those
+analyses leave open, and what \S3.2--3.5 address, is whether the effect is
+specific to glutamatergic neurons or to any comparable change in
+excitatory/inhibitory synaptic mass, how it depends on the weight scheme, and
+what it does in the browser packages that copied the FlyWire data but not the
+sign convention.
 
 \subsection{Matched random controls (E1)}
 
@@ -433,7 +480,9 @@ an honestly labeled olfaction limitation (saturating projection neurons, no
 clear descending steering signal, a hand-built reflex layer), and marks
 absolute firing rates as untrustworthy. flybench~\cite{flybench} offers
 pre-registered behavioral tasks on FlyWire v783 and MaleCNS with
-shuffled-wiring controls and a reference LIF implementation. Descending and
+shuffled-wiring controls --- including a \texttt{signflip} control that permutes
+signs among neurons while keeping every edge magnitude (\texttt{docs/CONTROLS.md})
+--- and a reference LIF implementation. Descending and
 ascending pathways have been compared across FlyWire, MANC and
 FANC~\cite{sturner2025}, and a brain-and-cord connectome (BANC) now
 exists~\cite{bates2026}.
@@ -441,9 +490,14 @@ exists~\cite{bates2026}.
 \textbf{What this note adds.} (i) An \textbf{audit protocol for packaging
 rules}: equivalence-checked rebuilds from source, mass-capped matched random
 controls, an equal-mass identity test, dose-response, and a second weight
-scheme --- each of which changed or narrowed a conclusion here. (ii) A
-concrete, checkable packaging discrepancy (the glutamate sign in a widely
-used browser package) and its quantified dynamical consequences. (iii) A scale
+scheme --- each of which changed or narrowed a conclusion here. These
+controls differ from a permutation control such as flybench's
+\texttt{signflip}: they flip one transmitter class at a time and match the
+flipped synaptic mass per functional group. (ii) A concrete, checkable
+packaging discrepancy (the glutamate sign, and row-level instead of
+neuron-level sign assignment, in a widely used browser package) and its
+quantified dynamical consequences, set against the sign-sensitivity analysis
+that Shiu et al.\ ran for their own model (\S3.1). (iii) A scale
 diagnosis of the reference global-max failure. (iv) A frozen public pipeline
 in which every number regenerates from one command (\S7). Where we converge
 with the upstream record --- weak odor$\to$descending steering, a gain cliff
@@ -522,7 +576,8 @@ FlyWire pools; MaleCNS conversion & \texttt{python game/tools/prepare\_pools.py}
 MaleCNS probes; ti table (\S2) & \texttt{node game/tools/probe\_malecns.mjs} \\
 sign variants (\S3.1) & \texttt{python game/tools/flyb\_to\_bin.py {-}{-}glut-excitatory}; \texttt{python game/tools/build\_flywire\_variant.py} \\
 bidirectional table (\S3.1) & \texttt{node game/tools/probe\_signflip.mjs} \\
-source row and label counts (\S2); intermediate tables for \S3 & \texttt{python game/tools/export\_sign\_tables.py} \\
+source row and label counts, row-level sign-mixing statistics (\S2); intermediate tables for \S3 & \texttt{python game/tools/export\_sign\_tables.py} \\
+Figure 1 (reads the archived outputs of the two scripts below) & \texttt{python game/tools/make\_figure1.py} \\
 label/edge statistics (\S2, \S3.1); E0a, E0b, E1, E1b, E2 (\S3.1--3.4) & \texttt{node game/tools/probe\_controls.mjs} \\
 E3, E3b, E3c; per-synapse scales (\S1.1, \S3.5) & \texttt{node game/tools/probe\_linear.mjs} \\
 MaleCNS feeding/escape/ascending probes & \texttt{node game/tools/probe\_supplementary.mjs} \\
@@ -543,7 +598,10 @@ FlyWire'' explanation, correcting the histamine sign-table description twice,
 correcting the FlyWire license to CC BY-NC 4.0, scoping the global-max failure
 to the reference gain, and replacing a ``no hand-crafted behaviour layer''
 claim with the explicit-rules list. v6.0 adds \S3.1--3.5 and withdraws the
-``sufficient and necessary'' framing. Point-by-point record:
+``sufficient and necessary'' framing. v6.1 adds Figure 1; acknowledges that
+Shiu et al.\ had already tested their model with glutamate excitatory (\S3.1),
+which v6.0 did not cite; and adds the row-level versus neuron-level sign
+statistics (\S2); no v6.0 number changes. Point-by-point record:
 \texttt{game/docs/REVIEW-RESPONSE.md}.
 
 \section*{Author contributions and AI-use disclosure}
@@ -557,8 +615,9 @@ simulation and game code and drafted versions v1--v5.1 of this note under the
 author's direction. Claude (Anthropic) audited v5.1 and, under the author's
 direction, designed and implemented the v6.0 control experiments
 (\texttt{export\_sign\_tables.py}, \texttt{variants.mjs},
-\texttt{probe\_controls.mjs}, \texttt{probe\_linear.mjs}) and revised the text.
-Codex and Claude performed the earlier technical reviews, including
+\texttt{probe\_controls.mjs}, \texttt{probe\_linear.mjs}) and revised the text;
+it also produced Figure 1 (\texttt{make\_figure1.py}) and the v6.1 prior-art
+check against the Shiu et al.\ full text. Codex and Claude performed the earlier technical reviews, including
 independent re-runs of the probe battery. No AI system is listed as an author;
 every number in this note comes from the frozen scripts listed above.
 

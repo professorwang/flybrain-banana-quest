@@ -13,6 +13,7 @@ for i, l in enumerate(stripped.split('\n'), 1):
     code = re.sub(r'(?<!\\)%.*', '', l)
     code = re.sub(r'\$[^$]*\$', '', code)          # 抠行内数学
     code = re.sub(r'\\url\{[^}]*\}', '', code)      # 抠 \url{...}（内部允许 _）
+    code = re.sub(r'\\includegraphics(\[[^\]]*\])?\{[^}]*\}', '', code)   # 文件名里的 _ 合法
     if re.search(r'(?<!\\)_', code):
         bad.append((i, l.strip()[:90]))
 print('texttt/数学/url 之外裸 _ 命中行数:', len(bad))

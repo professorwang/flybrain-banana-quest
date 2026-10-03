@@ -199,7 +199,9 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
         fig.savefig(OUT / f"fig1_controls.{ext}", dpi=300, facecolor="#fcfcfb")
-    print(f"写出 {OUT / 'fig1_controls.pdf'} 与 .png")
+    # 论文编译（arXiv 上传）需要图与 main.tex 同目录
+    fig.savefig(ROOT / "game" / "docs" / "arxiv" / "fig1_controls.pdf", facecolor="#fcfcfb")
+    print(f"写出 {OUT / 'fig1_controls.pdf'}、.png，并复制 PDF 到 docs/arxiv/")
 
 
 if __name__ == "__main__":
