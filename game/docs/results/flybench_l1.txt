@@ -1,0 +1,71 @@
+# Banana Quest l1_lif 在 flybench 的首次测量存档（非 flybench 官方认证）
+# 模型：game/tools/flybench_models/l1_lif.py（postsynaptic L1 归一化 + snedea/minecraft 符号规则）
+
+## FlyWire v783（TI=125 mV，3 种子，无对照，--allow-unpinned）
+# l1_lif: core=0.7333 hard=0.5356 graded=0.5484
+# 参考:  core=0.7667 hard=0.5634 graded=0.7157
+
+| task | reference gain=1.0 | l1_lif TI=125 | Δ graded |
+|---|---|---|---|
+| stability | PASS 0.995 | PASS 0.995 | +0.000 |
+| sugar_to_proboscis | FAIL 0.797 | FAIL 0.531 | -0.266 |
+| bitter_suppression | FAIL 0.622 | FAIL 0.330 | -0.292 |
+| looming_to_giant_fiber | FAIL 0.804 | PASS 0.998 | +0.193 |
+| taste_specificity | PASS 1.000 | FAIL 0.427 | -0.573 |
+| dose_response | FAIL 0.830 | FAIL 0.715 | -0.115 |
+| adaptation | PASS 0.999 | PASS 0.882 | -0.117 |
+| olfactory_sparse_coding | FAIL 0.572 | FAIL 0.525 | -0.048 |
+| crosstalk | PASS 0.998 | FAIL 0.641 | -0.357 |
+| looming_dn_ensemble | FAIL 0.716 | PASS 0.993 | +0.278 |
+| flash_is_not_loom | PASS 0.972 | FAIL 0.058 | -0.914 |
+| return_to_rest | FAIL 0.304 | FAIL 0.416 | +0.112 |
+| physiological_rates | FAIL 0.744 | FAIL 0.722 | -0.021 |
+| wiring_robustness | FAIL 0.754 | FAIL 0.738 | -0.015 |
+| gf_azimuth_invariance | FAIL 0.598 | FAIL 0.641 | +0.044 |
+| pn_transfer_function | FAIL 0.162 | FAIL 0.459 | +0.297 |
+| da1_sparseness | FAIL 0.111 | FAIL 0.587 | +0.476 |
+| lc_dn_matrix | FAIL 0.747 | FAIL 0.439 | -0.308 |
+| optic_flow_rotation | FAIL 0.826 | FAIL 0.458 | -0.368 |
+| antennal_grooming_vs_backward | FAIL 0.143 | FAIL 0.250 | +0.107 |
+| mb_sparseness_apl | FAIL 0.439 | FAIL 0.546 | +0.107 |
+| co2_pathway_specificity | FAIL 0.571 | FAIL 0.571 | +0.000 |
+| egg_laying_ovidn | FAIL 0.759 | FAIL 0.591 | -0.168 |
+| halt_walk_off | FAIL 0.795 | FAIL 0.230 | -0.565 |
+| flyvis_loom_escape | FAIL 0.000 | FAIL 0.001 | +0.001 |
+
+## MaleCNS v1.0（TI=84 mV，3 种子，无对照）
+# l1_lif: core=0.6667 hard=0.4977 graded=0.5190
+# 参考:  core=0.5667 hard=0.5366 graded=0.6390
+
+| task | reference gain=0.65 | l1_lif TI=84 | Δ graded |
+|---|---|---|---|
+| stability | PASS 0.995 | PASS 0.995 | +0.000 |
+| sugar_to_proboscis | FAIL 0.809 | FAIL 0.333 | -0.476 |
+| bitter_suppression | FAIL 0.820 | FAIL 0.000 | -0.820 |
+| looming_to_giant_fiber | FAIL 0.805 | PASS 0.999 | +0.193 |
+| taste_specificity | FAIL 0.218 | PASS 0.998 | +0.780 |
+| dose_response | FAIL 0.731 | FAIL 0.200 | -0.531 |
+| adaptation | FAIL 0.771 | FAIL 0.000 | -0.771 |
+| olfactory_sparse_coding | FAIL 0.565 | PASS 0.984 | +0.419 |
+| crosstalk | FAIL 0.750 | FAIL 0.749 | -0.001 |
+| looming_dn_ensemble | FAIL 0.710 | PASS 0.994 | +0.284 |
+| flash_is_not_loom | PASS 0.926 | FAIL 0.351 | -0.575 |
+| return_to_rest | FAIL 0.336 | FAIL 0.748 | +0.411 |
+| physiological_rates | FAIL 0.674 | FAIL 0.600 | -0.074 |
+| wiring_robustness | FAIL 0.762 | FAIL 0.799 | +0.037 |
+| looming_to_jump_muscle | FAIL 0.834 | FAIL 0.666 | -0.168 |
+| gf_azimuth_invariance | FAIL 0.644 | FAIL 0.644 | +0.000 |
+| pn_transfer_function | FAIL 0.452 | FAIL 0.487 | +0.035 |
+| da1_sparseness | FAIL 0.636 | PASS 0.950 | +0.314 |
+| gf_to_muscle_latency | FAIL 0.398 | FAIL 0.000 | -0.398 |
+| taste_modalities | FAIL 0.631 | FAIL 0.250 | -0.381 |
+| lc_dn_matrix | FAIL 0.860 | FAIL 0.913 | +0.052 |
+| courtship_song_chain | FAIL 0.819 | FAIL 0.125 | -0.694 |
+| leg_mn_size_principle | FAIL 0.326 | FAIL 0.452 | +0.126 |
+| optic_flow_rotation | FAIL 0.584 | FAIL 0.238 | -0.347 |
+| antennal_grooming_vs_backward | FAIL 0.342 | FAIL 0.250 | -0.092 |
+| mb_sparseness_apl | FAIL 0.465 | FAIL 0.678 | +0.213 |
+| co2_pathway_specificity | FAIL 0.571 | FAIL 0.855 | +0.283 |
+| steering_dna02_vs_dna01 | FAIL 0.167 | FAIL 0.167 | -0.000 |
+| epg_ring_attractor | FAIL 0.258 | FAIL 0.258 | +0.000 |
+| flyvis_loom_escape | FAIL 0.000 | FAIL 0.000 | +0.000 |

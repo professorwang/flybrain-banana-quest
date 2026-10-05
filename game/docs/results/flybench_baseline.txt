@@ -1,0 +1,30 @@
+# flybench 参考基线（shiu2024，gain=1.0）本机重跑存档
+# 命令：flybench run -c flywire783 --config configs/shiu2024.yaml --seeds 3 --jobs 6 --allow-unpinned
+# 环境：flybench v0.2.1, Python 3.13, Windows, 16 CPU；图：snedea 再分发 FlyWire v783（2,700,513 边，--allow-unpinned）
+# core_score=0.7667 hard_score=0.5634 score=0.6041 graded=0.7157
+
+  stability                        PASS  graded=0.995
+  sugar_to_proboscis               FAIL  graded=0.797
+  bitter_suppression               FAIL  graded=0.622
+  looming_to_giant_fiber           FAIL  graded=0.804
+  taste_specificity                PASS  graded=1.000
+  dose_response                    FAIL  graded=0.830
+  adaptation                       PASS  graded=0.999
+  olfactory_sparse_coding          FAIL  graded=0.572
+  crosstalk                        PASS  graded=0.998
+  looming_dn_ensemble              FAIL  graded=0.716
+  flash_is_not_loom                PASS  graded=0.972
+  return_to_rest                   FAIL  graded=0.304
+  physiological_rates              FAIL  graded=0.744
+  wiring_robustness                FAIL  graded=0.754
+  gf_azimuth_invariance            FAIL  graded=0.598
+  pn_transfer_function             FAIL  graded=0.162
+  da1_sparseness                   FAIL  graded=0.111
+  lc_dn_matrix                     FAIL  graded=0.747
+  optic_flow_rotation              FAIL  graded=0.826
+  antennal_grooming_vs_backward    FAIL  graded=0.143
+  mb_sparseness_apl                FAIL  graded=0.439
+  co2_pathway_specificity          FAIL  graded=0.571
+  egg_laying_ovidn                 FAIL  graded=0.759
+  halt_walk_off                    FAIL  graded=0.795
+  flyvis_loom_escape               FAIL  graded=0.000
